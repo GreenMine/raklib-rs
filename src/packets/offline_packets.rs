@@ -1,4 +1,4 @@
-pub use super::{Packet, PacketDecode, PacketEncode};
+pub use super::{PacketDecode, PacketEncode};
 use crate::types::RakNetString;
 pub use crate::{types::Magic, utils::BinaryStream, consts};
 

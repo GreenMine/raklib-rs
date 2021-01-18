@@ -1,7 +1,6 @@
 use std::net::SocketAddr;
-
-pub use super::{Packet, PacketDecode, PacketEncode};
-pub use crate::{types::Magic, utils::BinaryStream, consts};
+use super::{PacketDecode, PacketEncode};
+use crate::{types::Magic, utils::BinaryStream, consts};
 //TODO: Add prelude?
 
 pub struct FirstOpenConnectionRequest {

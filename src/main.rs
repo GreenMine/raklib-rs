@@ -6,13 +6,13 @@ mod types;
 pub mod consts;
 mod packets;
 
+use utils::BinaryStream;
 use packets::*;
 
 fn main() -> std::io::Result<()> {
     let address = "127.0.0.1:19133";
     let socket = UdpSocket::bind(address)?;
     let mut bstream = BinaryStream::with_len(2048);
-    //let mut buffer = [0u8; 2048];
 
     println!("RakNet connection opened on {}", address);
     println!("Waiting message...");

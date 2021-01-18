@@ -12,10 +12,6 @@ pub struct BinaryStream {
 
 //New
 impl BinaryStream {
-    pub fn from_slice(slice: &[u8]) -> Self {
-        Self::new(slice.to_vec())//TODO: always copy
-    }
-
     pub fn with_len(len: usize) -> Self {
         Self::new(vec![0u8; len])
     }
@@ -23,7 +19,6 @@ impl BinaryStream {
     pub fn new(vec: Vec<u8>) -> Self {
         Self {data: vec, p : 0}
     }
-
 }
 
 //Setters
