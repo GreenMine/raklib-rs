@@ -1,7 +1,5 @@
-use crate::types::Magic;
-
 pub struct BinaryStream {
-    pub data: Vec<u8>,
+    pub data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
     p: usize
 }
 
@@ -10,7 +8,7 @@ pub struct BinaryStream {
 //New
 impl BinaryStream {
     pub fn from_slice(slice: &[u8]) -> Self {
-        Self::new(slice.to_vec())
+        Self::new(slice.to_vec())//TODO: always copy
     }
 
     pub fn with_len(len: usize) -> Self {
@@ -33,10 +31,6 @@ impl BinaryStream {
         }
     }
 
-    pub fn add_magic(&mut self, magic: Magic) {
-        self.add_slice(&magic.data[..]);
-    }
-
     //FIXME: Check the overflow
     pub fn add_slice(&mut self, slice: &[u8]) {
         &self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
@@ -52,10 +46,6 @@ impl BinaryStream {
         unsafe {
             *(res.as_ptr() as *const T)
         }
-    }
-
-    pub fn read_magic(&mut self) -> Magic {
-        unsafe {*(self.read_slice(16).as_ptr() as *const Magic)}
     }
 
     pub fn read_slice_be(&mut self, n: usize) -> &[u8] {

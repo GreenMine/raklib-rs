@@ -1,4 +1,5 @@
 pub use super::{Packet, PacketDecode, PacketEncode};
+use crate::types::RakNetString;
 pub use crate::{types::Magic, utils::BinaryStream, consts};
 
 pub struct OfflinePingPacket {
@@ -9,35 +10,34 @@ pub struct OfflinePingPacket {
 
 //TODO: Rewrite it to proc-macro
 impl PacketDecode for OfflinePingPacket {
-    fn decode(bstream: &mut BinaryStream) -> Self {
+    fn decode(packet: &mut Packet) -> Self {
         OfflinePingPacket {
-            time: bstream.read(),
-            magic: bstream.read_magic(),
-            client_guid: bstream.read()
+            time: packet.stream.read(),
+            magic: packet.read_magic(),
+            client_guid: packet.stream.read()
         }
     }
 }
 
-pub struct OfflinePongPacket {
+pub struct OfflinePongPacket<'a> {
     pub time: u64,
-    pub server_id_string: String //TODO: Add own string structure
+    pub server_id_string: RakNetString<'a>
 }
 
-impl OfflinePongPacket {
-    pub fn new(time: u64, server_id_string: String) -> Self {
-        Self { time, server_id_string }
+impl<'a> OfflinePongPacket<'a> {
+    pub fn new(time: u64, server_id_string: &'a String) -> Self {
+        Self { time, server_id_string: RakNetString::from_string(server_id_string) }
     }
 }
 
-impl PacketEncode for OfflinePongPacket {
+impl<'a> PacketEncode for OfflinePongPacket<'a> {
     fn encode(&self) -> Packet {
-        let mut packet = Packet::new(0x1c, 8 + 8 + 16 + (2 + self.server_id_string.len()));
+        let mut packet = Packet::new(0x1c, 8 + 8 + 16 + (2 + self.server_id_string.length as usize));
         
         packet.stream.add(self.time);
         packet.stream.add(consts::SERVER_GUID);
-        packet.stream.add_magic(consts::MAGIC);
-        packet.stream.add(self.server_id_string.len() as u16);
-        packet.stream.add_slice(&self.server_id_string.as_bytes());
+        packet.add_magic(consts::MAGIC);
+        packet.add_string(&self.server_id_string);
 
         packet
     }

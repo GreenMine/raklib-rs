@@ -6,40 +6,34 @@ mod types;
 pub mod consts;
 mod packets;
 
-use types::RakNetString;
-use utils::BinaryStream;
 use packets::*;
 
 fn main() -> std::io::Result<()> {
-    let socket = UdpSocket::bind("127.0.0.1:19133")?;
+    let address = "127.0.0.1:19133";
+    let socket = UdpSocket::bind(address)?;
     let mut buffer = [0u8; 2048];
-    
+
+    println!("RakNet connection opened on {}", address);
     println!("Waiting message...");
     loop {
         let (readed_bytes, addr) = socket.recv_from(&mut buffer).expect("no date received!");
         let start = std::time::Instant::now();
 
-        /*print!("Result: '");
-        &buffer[0..readed_bytes].into_iter().for_each(|&d| print!("{}", d as char));
-        println!("'");*/
-        /*println!("Got:");
-        print_binary(&buffer[0..readed_bytes]);*/
+        let mut packet = Packet::from_slice(&buffer[..readed_bytes]);
 
-        let mut bstream = BinaryStream::from_slice(&buffer[..readed_bytes]);
-        let packet_id = bstream.read::<u8>();
-        match packet_id {
+        match packet.id {
             0x1 => {
-                let offline_packet = OfflinePingPacket::decode(&mut bstream);
+                let offline_packet = OfflinePingPacket::decode(&mut packet);
 
                 let server_id_string = "MCPE;Rust core test;422;1.16.200;0;2000;2570685482448425430;RakLibRS;Survival;".to_string();
-                let reply = OfflinePongPacket::new(offline_packet.time, server_id_string);
+                let reply = OfflinePongPacket::new(offline_packet.time, &server_id_string);
 
                 socket.send_to(&reply.encode().stream.data[..], addr)?;
             },
             0x5 => {
                 println!("Open Connection Request 1");
 
-                let request = FirstOpenConnectionRequest::decode(&mut bstream);
+                let request = FirstOpenConnectionRequest::decode(&mut packet);
                 let reply = FirstOpenConnectionReply::new(false, request.mtu_lenght);
 
                 socket.send_to(&reply.encode().stream.data[..], addr)?;
@@ -48,13 +42,15 @@ fn main() -> std::io::Result<()> {
             },
             0x7 => {
                     println!("Open Connection Request 2");
+                    let request2 = SecondOpenConnectionRequest::decode(&mut packet);
+                    let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
-                    let mut response = BinaryStream::with_len(1 + 16 + 8 + 7 + 2 + 1);
-
-                   unimplemented!();
+                    socket.send_to(&reply2.encode().stream.data[..], addr)?;
             }
             _ => {
-                unimplemented!("PACKET ID: 0x{:02X}", packet_id)
+                print!("Readed data: ");
+                print_binary(&buffer[0..readed_bytes]);
+                unimplemented!("PACKET ID: 0x{:02X}", packet.id)
             }
         }
 
