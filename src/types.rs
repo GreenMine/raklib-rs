@@ -1,4 +1,5 @@
 use std::fmt::{Display, Formatter, self};
+
 #[derive(Clone, Copy)]
 pub struct Magic {
     pub data: [u8; 16]

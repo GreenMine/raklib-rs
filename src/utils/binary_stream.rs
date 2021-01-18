@@ -25,20 +25,20 @@ impl BinaryStream {
 
 //Setters
 impl BinaryStream {
-    pub fn set<T>(&mut self, mut data: T) {
+    pub fn add<T>(&mut self, mut data: T) {
         unsafe {
             let slice = std::slice::from_raw_parts_mut((&mut data as *mut T) as *mut u8, std::mem::size_of::<T>());
             slice.reverse();
-            self.set_slice(slice)
+            self.add_slice(slice)
         }
     }
 
-    pub fn set_magic(&mut self, magic: Magic) {
-        self.set_slice(&magic.data[..]);
+    pub fn add_magic(&mut self, magic: Magic) {
+        self.add_slice(&magic.data[..]);
     }
 
     //FIXME: Check the overflow
-    pub fn set_slice(&mut self, slice: &[u8]) {
+    pub fn add_slice(&mut self, slice: &[u8]) {
         &self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
         self.p += slice.len();
     }
@@ -63,6 +63,11 @@ impl BinaryStream {
         res.reverse();
 
         res
+    }
+
+    //FIXME: Set pointer to end
+    pub fn read_to_end(&mut self) -> &[u8] {
+        &self.data[self.p..]
     }
 
     //FIXME: Check the overflow
