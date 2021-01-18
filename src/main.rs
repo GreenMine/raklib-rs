@@ -1,4 +1,4 @@
-use std::net::UdpSocket;
+use std::{net::UdpSocket, unimplemented};
 
 
 mod utils;
@@ -6,6 +6,7 @@ mod types;
 pub mod consts;
 mod packets;
 
+use types::RakNetString;
 use utils::BinaryStream;
 use packets::*;
 
@@ -31,20 +32,17 @@ fn main() -> std::io::Result<()> {
                 let offline_packet = OfflinePingPacket::decode(&mut bstream);
 
                 let server_id_string = "MCPE;Rust core test;422;1.16.200;0;2000;2570685482448425430;RakLibRS;Survival;".to_string();
-                let response = OfflinePongPacket::new(offline_packet.time, server_id_string);
+                let reply = OfflinePongPacket::new(offline_packet.time, server_id_string);
 
-                socket.send_to(&response.encode().stream.data[..], addr)?;
+                socket.send_to(&reply.encode().stream.data[..], addr)?;
             },
             0x5 => {
-                println!("Open Connection Reply 1");
-                let mut response = BinaryStream::with_len(1 + 16 + 8 + 1 + 2);
-                response.add(0x06_u8);
-                response.add_magic(consts::MAGIC);
-                response.add(consts::SERVER_GUID);
-                response.add(false);
-                response.add(readed_bytes as u16);
+                println!("Open Connection Request 1");
 
-                socket.send_to(&response.data[..], addr)?;
+                let request = FirstOpenConnectionRequest::decode(&mut bstream);
+                let reply = FirstOpenConnectionReply::new(false, request.mtu_lenght);
+
+                socket.send_to(&reply.encode().stream.data[..], addr)?;
                 /*println!("Result");
                 print_binary(bstream.read_slice(readed_bytes - 1));*/
             },
@@ -53,7 +51,7 @@ fn main() -> std::io::Result<()> {
 
                     let mut response = BinaryStream::with_len(1 + 16 + 8 + 7 + 2 + 1);
 
-                    
+                   unimplemented!();
             }
             _ => {
                 unimplemented!("PACKET ID: 0x{:02X}", packet_id)

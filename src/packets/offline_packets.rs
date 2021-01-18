@@ -11,9 +11,9 @@ pub struct OfflinePingPacket {
 impl PacketDecode for OfflinePingPacket {
     fn decode(bstream: &mut BinaryStream) -> Self {
         OfflinePingPacket {
-            time: bstream.read::<u64>(),
+            time: bstream.read(),
             magic: bstream.read_magic(),
-            client_guid: bstream.read::<u64>()
+            client_guid: bstream.read()
         }
     }
 }

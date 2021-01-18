@@ -1,4 +1,5 @@
-use crate::utils::BinaryStream;
+use crate::{utils::BinaryStream, types::Magic};
+
 
 pub struct Packet {
     pub stream: BinaryStream,
@@ -10,6 +11,14 @@ impl Packet {
         bstream.add(packet_id);
 
         Self { stream: bstream }
+    }
+
+    pub fn add_magic(&mut self, magic: Magic) {
+        self.stream.add_slice(&magic.data[..]);
+    }
+
+    pub fn read_magic(&mut self) -> Magic {
+        unsafe {*(self.stream.read_slice(16).as_ptr() as *const Magic)}
     }
 }
 
