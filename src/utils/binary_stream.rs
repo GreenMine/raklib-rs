@@ -1,3 +1,8 @@
+use std::{net::{IpAddr, Ipv4Addr, SocketAddr}, unimplemented};
+
+use crate::{types::{Magic, RakNetString}};
+
+
 pub struct BinaryStream {
     pub data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
     p: usize
@@ -73,5 +78,52 @@ impl BinaryStream {
 impl BinaryStream {
     pub fn skip(&mut self, n: usize) {
         self.p += n;
+    }
+    pub fn clear(&mut self) {
+        self.p = 0;
+    }
+}
+
+
+
+//Env
+impl BinaryStream {
+    pub fn add_string(&mut self, string: &RakNetString) {
+        self.add(string.length);
+        self.add_slice(string.data);
+    }
+
+    pub fn add_magic(&mut self, magic: Magic) {
+        self.add_slice(&magic.data[..]);
+    }
+
+    pub fn add_address(&mut self, address: SocketAddr) {
+        self.add(if address.is_ipv4() { 4u8 } else { 6u8 });
+
+        self.add_slice(&match address.ip() {
+            IpAddr::V4(addr) => addr.octets(),
+            IpAddr::V6(_addr) => unimplemented!() 
+        });
+
+        self.add(address.port());
+        //from raw parts...............
+    }
+
+    pub fn read_string(&mut self) -> RakNetString {
+        let len = self.read();
+        RakNetString {
+            length: len,
+            data: self.read_slice(len as usize)
+        }
+    }
+
+    pub fn read_magic(&mut self) -> Magic {
+        unsafe {*(self.read_slice(16).as_ptr() as *const Magic)}
+    }
+
+    //FIXME: only IPv4
+    pub fn read_address(&mut self) -> SocketAddr {
+        self.skip(1);
+        SocketAddr::new(IpAddr::V4(Ipv4Addr::new(self.read(), self.read(), self.read(), self.read())), self.read())
     }
 }

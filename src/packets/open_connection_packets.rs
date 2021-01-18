@@ -11,11 +11,11 @@ pub struct FirstOpenConnectionRequest {
 }
 
 impl PacketDecode for FirstOpenConnectionRequest {
-    fn decode(packet: &mut Packet) -> Self {
+    fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
-            magic: packet.read_magic(),
-            protocol_version: packet.stream.read(),
-            mtu_lenght: packet.stream.data.len() as u16
+            magic: bstream.read_magic(),
+            protocol_version: bstream.read(),
+            mtu_lenght: bstream.data.len() as u16
         }
     }
 }
@@ -32,14 +32,16 @@ impl FirstOpenConnectionReply {
 }
 
 impl PacketEncode for FirstOpenConnectionReply {
-    fn encode(&self) -> Packet {
-        let mut packet = Packet::new(0x06, 16 + 8 + 1 + 2);
-        packet.add_magic(consts::MAGIC);
-        packet.stream.add(consts::SERVER_GUID);
-        packet.stream.add(self.use_security);
-        packet.stream.add(self.mtu_length);
+    fn encode(&self) -> BinaryStream {
+        let mut bstream = BinaryStream::with_len(1 + 16 + 8 + 1 + 2);
 
-        packet
+        bstream.add(0x06_u8);
+        bstream.add_magic(consts::MAGIC);
+        bstream.add(consts::SERVER_GUID);
+        bstream.add(self.use_security);
+        bstream.add(self.mtu_length);
+
+        bstream
     }
 }
 
@@ -53,12 +55,12 @@ pub struct SecondOpenConnectionRequest {
 }
 
 impl PacketDecode for SecondOpenConnectionRequest {
-    fn decode(packet: &mut Packet) -> Self {
+    fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
-            magic: packet.read_magic(),
-            server_address: packet.read_address(),
-            mtu_length: packet.stream.read(),
-            client_guid: packet.stream.read()
+            magic: bstream.read_magic(),
+            server_address: bstream.read_address(),
+            mtu_length: bstream.read(),
+            client_guid: bstream.read()
         }
     }
 }
@@ -76,15 +78,16 @@ impl SecondOpenConnectionReply {
 }
 
 impl PacketEncode for SecondOpenConnectionReply {
-    fn encode(&self) -> Packet {
-        let mut packet = Packet::new(0x08, 16 + 8 + 7 + 2 + 1);
+    fn encode(&self) -> BinaryStream {
+        let mut bstream = BinaryStream::with_len(1 + 16 + 8 + 7 + 2 + 1);
 
-        packet.add_magic(consts::MAGIC);
-        packet.stream.add(consts::SERVER_GUID);
-        packet.add_address(self.client_address);
-        packet.stream.add(self.mtu_length);
-        packet.stream.add(self.enctyption);
+        bstream.add(0x08_u8);
+        bstream.add_magic(consts::MAGIC);
+        bstream.add(consts::SERVER_GUID);
+        bstream.add_address(self.client_address);
+        bstream.add(self.mtu_length);
+        bstream.add(self.enctyption);
 
-        packet
+        bstream
     }
 }

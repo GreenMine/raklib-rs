@@ -10,11 +10,11 @@ pub struct OfflinePingPacket {
 
 //TODO: Rewrite it to proc-macro
 impl PacketDecode for OfflinePingPacket {
-    fn decode(packet: &mut Packet) -> Self {
+    fn decode(bstream: &mut BinaryStream) -> Self {
         OfflinePingPacket {
-            time: packet.stream.read(),
-            magic: packet.read_magic(),
-            client_guid: packet.stream.read()
+            time: bstream.read(),
+            magic: bstream.read_magic(),
+            client_guid: bstream.read()
         }
     }
 }
@@ -31,14 +31,15 @@ impl<'a> OfflinePongPacket<'a> {
 }
 
 impl<'a> PacketEncode for OfflinePongPacket<'a> {
-    fn encode(&self) -> Packet {
-        let mut packet = Packet::new(0x1c, 8 + 8 + 16 + (2 + self.server_id_string.length as usize));
+    fn encode(&self) -> BinaryStream {
+        let mut bstream = BinaryStream::with_len(1 + 8 + 8 + 16 + (2 + self.server_id_string.length as usize));
         
-        packet.stream.add(self.time);
-        packet.stream.add(consts::SERVER_GUID);
-        packet.add_magic(consts::MAGIC);
-        packet.add_string(&self.server_id_string);
+        bstream.add(0x1c_u8);
+        bstream.add(self.time);
+        bstream.add(consts::SERVER_GUID);
+        bstream.add_magic(consts::MAGIC);
+        bstream.add_string(&self.server_id_string);
 
-        packet
+        bstream
     }
 }
