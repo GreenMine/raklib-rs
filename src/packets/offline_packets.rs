@@ -1,6 +1,5 @@
-pub use super::{PacketDecode, PacketEncode};
-use crate::types::RakNetString;
-pub use crate::{types::Magic, utils::BinaryStream, consts};
+use super::Packet;
+use crate::{types::{Magic, RakNetString}, utils::BinaryStream, consts};
 
 pub struct OfflinePingPacket {
     pub time: u64,
@@ -9,7 +8,9 @@ pub struct OfflinePingPacket {
 }
 
 //TODO: Rewrite it to proc-macro
-impl PacketDecode for OfflinePingPacket {
+impl Packet for OfflinePingPacket {
+    const ID: u8 = 0x01;
+
     fn decode(bstream: &mut BinaryStream) -> Self {
         OfflinePingPacket {
             time: bstream.read(),
@@ -30,7 +31,9 @@ impl<'a> OfflinePongPacket<'a> {
     }
 }
 
-impl<'a> PacketEncode for OfflinePongPacket<'a> {
+impl<'a> Packet for OfflinePongPacket<'a> {
+    const ID: u8 = 0x1c;
+
     fn encode(&self) -> BinaryStream {
         let mut bstream = BinaryStream::with_len(1 + 8 + 8 + 16 + (2 + self.server_id_string.length as usize));
         

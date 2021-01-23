@@ -55,11 +55,6 @@ impl BinaryStream {
         res
     }
 
-    //FIXME: Set pointer to end
-    pub fn read_to_end(&mut self) -> &[u8] {
-        &self.data[self.p..]
-    }
-
     //FIXME: Check the overflow
     pub fn read_slice(&mut self, n: usize) -> &mut [u8] {
         let result = &mut self.data[self.p..self.p + n];

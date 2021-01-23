@@ -4,4 +4,3 @@ mod address;
 
 pub use magic::Magic;
 pub use string::RakNetString;
-//pub use address::Address;

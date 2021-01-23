@@ -1,8 +1,15 @@
 use std::fmt::{Display, Formatter, self};
+use crate::consts::MAGIC;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Magic {
     pub data: [u8; 16]
+}
+
+impl Magic {
+    pub fn is_valid(&self) -> bool {
+        self.data.iter().zip(MAGIC.data.iter()).all(|(&a, &b)| a == b)
+    }
 }
 
 impl Display for Magic {

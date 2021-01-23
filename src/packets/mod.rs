@@ -1,5 +1,5 @@
 mod packet;
-pub use packet::{PacketDecode, PacketEncode};
+pub use packet::Packet;
 
 mod offline_packets;
 mod open_connection_packets;

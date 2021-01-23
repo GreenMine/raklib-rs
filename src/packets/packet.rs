@@ -1,9 +1,12 @@
 use crate::utils::BinaryStream;
 
-pub trait PacketDecode {
-    fn decode(bstream: &mut BinaryStream) -> Self;
-}
+pub trait Packet {
+    const ID: u8;
 
-pub trait PacketEncode {
-    fn encode(&self) -> BinaryStream;
+    fn decode(_bstream: &mut BinaryStream) -> Self where Self: Sized {
+        unimplemented!()
+    }
+    fn encode(&self) -> BinaryStream {
+        unimplemented!()
+    }
 }

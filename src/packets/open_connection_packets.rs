@@ -1,6 +1,7 @@
-use std::net::SocketAddr;
-use super::{PacketDecode, PacketEncode};
+use super::Packet;
 use crate::{types::Magic, utils::BinaryStream, consts};
+
+use std::net::SocketAddr;
 //TODO: Add prelude?
 
 pub struct FirstOpenConnectionRequest {
@@ -9,7 +10,9 @@ pub struct FirstOpenConnectionRequest {
     pub mtu_lenght: u16
 }
 
-impl PacketDecode for FirstOpenConnectionRequest {
+impl Packet for FirstOpenConnectionRequest {
+    const ID: u8 = 0x05;
+
     fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
             magic: bstream.read_magic(),
@@ -30,11 +33,13 @@ impl FirstOpenConnectionReply {
     }
 }
 
-impl PacketEncode for FirstOpenConnectionReply {
+impl Packet for FirstOpenConnectionReply {
+    const ID: u8 = 0x06;
+
     fn encode(&self) -> BinaryStream {
         let mut bstream = BinaryStream::with_len(1 + 16 + 8 + 1 + 2);
 
-        bstream.add(0x06_u8);
+        bstream.add(Self::ID);
         bstream.add_magic(consts::MAGIC);
         bstream.add(consts::SERVER_GUID);
         bstream.add(self.use_security);
@@ -53,7 +58,9 @@ pub struct SecondOpenConnectionRequest {
     pub client_guid: u64
 }
 
-impl PacketDecode for SecondOpenConnectionRequest {
+impl Packet for SecondOpenConnectionRequest {
+    const ID: u8 = 0x07;
+
     fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
             magic: bstream.read_magic(),
@@ -76,11 +83,13 @@ impl SecondOpenConnectionReply {
     }
 }
 
-impl PacketEncode for SecondOpenConnectionReply {
+impl Packet for SecondOpenConnectionReply {
+    const ID: u8 = 0x08;
+
     fn encode(&self) -> BinaryStream {
         let mut bstream = BinaryStream::with_len(1 + 16 + 8 + 7 + 2 + 1);
 
-        bstream.add(0x08_u8);
+        bstream.add(Self::ID);
         bstream.add_magic(consts::MAGIC);
         bstream.add(consts::SERVER_GUID);
         bstream.add_address(self.client_address);
