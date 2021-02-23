@@ -1,7 +1,7 @@
 use std::{net::{ToSocketAddrs, UdpSocket}, time::Instant};
 use crate::utils::BinaryStream;
 
-use crate::packets::*;
+use crate::protocol::packets::*;
 
 pub struct UdpServer {
     address: String,

@@ -1,6 +1,6 @@
 use std::{net::{IpAddr, Ipv4Addr, SocketAddr}, unimplemented};
 
-use crate::{packets::PacketDecode, types::{Magic, RakNetString}};
+use crate::protocol::{packets::PacketDecode, types::{Magic, RakNetString}};
 
 
 pub struct BinaryStream {

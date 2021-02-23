@@ -1,5 +1,5 @@
 use super::{Packet, PacketEncode, PacketDecode};
-use crate::{types::Magic, utils::BinaryStream, consts};
+use crate::{protocol::{types::Magic, consts}, utils::BinaryStream};
 
 use std::net::SocketAddr;
 //TODO: Add prelude?

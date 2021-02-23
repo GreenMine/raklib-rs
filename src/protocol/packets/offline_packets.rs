@@ -1,5 +1,5 @@
 use super::{Packet, PacketEncode, PacketDecode};
-use crate::{types::{Magic, RakNetString}, utils::BinaryStream, consts};
+use crate::{protocol::{types::{Magic, RakNetString}, consts}, utils::BinaryStream};
 
 pub struct OfflinePingPacket {
     pub time: u64,

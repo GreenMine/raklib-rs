@@ -15,12 +15,13 @@ pub trait PacketEncode: Packet {
     where Self: Sized
     {
         let mut bstream = BinaryStream::with_len(1 + self.packet_size());
-        bstream.add(Self::ID);
+        self.encode_header(&mut bstream);
         self.encode_payload(&mut bstream);
 
         bstream
     }
 
+    fn encode_header(&self, bstream: &mut BinaryStream) { bstream.add(Self::ID) }
     fn encode_payload(&self, bstream: &mut BinaryStream);
 }
 

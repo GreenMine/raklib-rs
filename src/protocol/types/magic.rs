@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter, self};
-use crate::consts::MAGIC;
+use crate::protocol::consts::MAGIC;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Magic {
