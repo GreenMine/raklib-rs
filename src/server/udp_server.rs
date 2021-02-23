@@ -1,18 +1,20 @@
-use std::net::{ToSocketAddrs, UdpSocket};
+use std::{net::{ToSocketAddrs, UdpSocket}, time::Instant};
 use crate::utils::BinaryStream;
 
 use crate::packets::*;
 
 pub struct UdpServer {
     address: String,
-    socket: UdpSocket
+    socket: UdpSocket,
+    start_time: Instant
 }
 
 impl UdpServer {
     pub fn new(address: &str) -> std::io::Result<Self> {
         Ok(Self {
                 address: address.to_string(),
-                socket: UdpSocket::bind(address)?
+                socket: UdpSocket::bind(address)?,
+                start_time: Instant::now()
         })
     }
 
@@ -32,7 +34,7 @@ impl UdpServer {
             let packet_id = bstream.read::<u8>();
             match packet_id {
                 OfflinePingPacket::ID => {
-                    let offline_packet = OfflinePingPacket::decode(&mut bstream);
+                    let offline_packet = bstream.decode::<OfflinePingPacket>();
 
                     let server_id_string = "MCPE;Rust core test;422;1.16.200;0;2000;2570685482448425430;RakLibRS;Survival;".to_string();
                     let reply = OfflinePongPacket::new(offline_packet.time, &server_id_string);
@@ -42,17 +44,18 @@ impl UdpServer {
                 FirstOpenConnectionRequest::ID => {
                     println!("Open Connection Request 1");
 
-                    let request = FirstOpenConnectionRequest::decode(&mut bstream);
+                    let request = bstream.decode::<FirstOpenConnectionRequest>();
                     let reply = FirstOpenConnectionReply::new(false, request.mtu_lenght);
 
                     self.send(reply, addr)?;
                 }
                 SecondOpenConnectionRequest::ID => {
                     println!("Open Connection Request 2");
-                    let request2 = SecondOpenConnectionRequest::decode(&mut bstream);
+                    let request2 = bstream.decode::<SecondOpenConnectionRequest>();
                     let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
                     self.send(reply2, addr)?;
+                    let elepsed_millis = self.start_time.elapsed().as_millis() as i64;
                 }
                 0x80..=0x8d => {
                     println!("Frame set packet");
@@ -70,7 +73,7 @@ impl UdpServer {
         }
     }
 
-    fn send<T: Packet, A: ToSocketAddrs>(&mut self, packet: T, addr: A) -> std::io::Result<usize> {
+    fn send<T: PacketEncode, A: ToSocketAddrs>(&mut self, packet: T, addr: A) -> std::io::Result<usize> {
         self.socket.send_to(&packet.encode().data[..], addr)
     }
 

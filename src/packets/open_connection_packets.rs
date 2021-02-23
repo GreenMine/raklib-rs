@@ -1,4 +1,4 @@
-use super::Packet;
+use super::{Packet, PacketEncode, PacketDecode};
 use crate::{types::Magic, utils::BinaryStream, consts};
 
 use std::net::SocketAddr;
@@ -12,7 +12,8 @@ pub struct FirstOpenConnectionRequest {
 
 impl Packet for FirstOpenConnectionRequest {
     const ID: u8 = 0x05;
-
+}
+impl PacketDecode for FirstOpenConnectionRequest {
     fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
             magic: bstream.read_magic(),
@@ -36,16 +37,15 @@ impl FirstOpenConnectionReply {
 impl Packet for FirstOpenConnectionReply {
     const ID: u8 = 0x06;
 
-    fn encode(&self) -> BinaryStream {
-        let mut bstream = BinaryStream::with_len(1 + 16 + 8 + 1 + 2);
+    fn packet_size(&self) -> usize { 16 + 8 + 1 + 2 }
+}
 
-        bstream.add(Self::ID);
+impl PacketEncode for FirstOpenConnectionReply {
+    fn encode_payload(&self, bstream: &mut BinaryStream) {
         bstream.add_magic(consts::MAGIC);
         bstream.add(consts::SERVER_GUID);
         bstream.add(self.use_security);
         bstream.add(self.mtu_length);
-
-        bstream
     }
 }
 
@@ -60,7 +60,8 @@ pub struct SecondOpenConnectionRequest {
 
 impl Packet for SecondOpenConnectionRequest {
     const ID: u8 = 0x07;
-
+}
+impl PacketDecode for SecondOpenConnectionRequest {
     fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
             magic: bstream.read_magic(),
@@ -85,17 +86,15 @@ impl SecondOpenConnectionReply {
 
 impl Packet for SecondOpenConnectionReply {
     const ID: u8 = 0x08;
+    fn packet_size(&self) -> usize { 16 + 8 + 7 + 2 + 1 }
+}
 
-    fn encode(&self) -> BinaryStream {
-        let mut bstream = BinaryStream::with_len(1 + 16 + 8 + 7 + 2 + 1);
-
-        bstream.add(Self::ID);
+impl PacketEncode for SecondOpenConnectionReply {
+    fn encode_payload(&self, bstream: &mut BinaryStream) {
         bstream.add_magic(consts::MAGIC);
         bstream.add(consts::SERVER_GUID);
         bstream.add_address(self.client_address);
         bstream.add(self.mtu_length);
         bstream.add(self.enctyption);
-
-        bstream
     }
 }

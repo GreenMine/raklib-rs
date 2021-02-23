@@ -1,6 +1,6 @@
 use std::{net::{IpAddr, Ipv4Addr, SocketAddr}, unimplemented};
 
-use crate::{types::{Magic, RakNetString}};
+use crate::{packets::PacketDecode, types::{Magic, RakNetString}};
 
 
 pub struct BinaryStream {
@@ -72,9 +72,11 @@ impl BinaryStream {
     pub fn clear(&mut self) {
         self.p = 0;
     }
+
+    pub fn decode<T: PacketDecode>(&mut self) -> T {
+        T::decode(self)
+    }
 }
-
-
 
 //Env
 impl BinaryStream {
