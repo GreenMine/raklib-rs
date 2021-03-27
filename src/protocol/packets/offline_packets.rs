@@ -34,7 +34,7 @@ impl<'a> OfflinePongPacket<'a> {
 
 impl<'a> Packet for OfflinePongPacket<'a> {
     const ID: u8 = 0x1c;
-    fn packet_size(&self) -> usize { 8 + 8 + 16 + (2 + self.server_id_string.length as usize) }
+    fn packet_size(&self) -> usize { 1 + 8 + 8 + 16 + (2 + self.server_id_string.length as usize) }
 }
 
 impl<'a> PacketEncode for OfflinePongPacket<'a> {

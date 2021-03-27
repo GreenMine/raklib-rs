@@ -37,7 +37,7 @@ impl FirstOpenConnectionReply {
 impl Packet for FirstOpenConnectionReply {
     const ID: u8 = 0x06;
 
-    fn packet_size(&self) -> usize { 16 + 8 + 1 + 2 }
+    fn packet_size(&self) -> usize { 1 + 16 + 8 + 1 + 2 }
 }
 
 impl PacketEncode for FirstOpenConnectionReply {
@@ -86,7 +86,7 @@ impl SecondOpenConnectionReply {
 
 impl Packet for SecondOpenConnectionReply {
     const ID: u8 = 0x08;
-    fn packet_size(&self) -> usize { 16 + 8 + 7 + 2 + 1 }
+    fn packet_size(&self) -> usize { 1 + 16 + 8 + 7 + 2 + 1 }
 }
 
 impl PacketEncode for SecondOpenConnectionReply {

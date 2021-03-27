@@ -6,7 +6,7 @@ pub trait Packet {
     fn packet_size(&self) -> usize
     where Self: Sized
     {
-        dbg!(std::mem::size_of::<Self>())
+        dbg!(std::mem::size_of::<Self>() + 1)
     }
 }
 
@@ -21,7 +21,7 @@ pub trait PacketEncode: Packet {
     fn encode(&self) -> BinaryStream
     where Self: Sized
     {
-        let mut bstream = BinaryStream::with_len(1 + self.packet_size());
+        let mut bstream = BinaryStream::with_len(self.packet_size());
         
         self.encode_with_buf(&mut bstream);
 
@@ -29,11 +29,9 @@ pub trait PacketEncode: Packet {
     }
 
     fn encode_header(&self, bstream: &mut BinaryStream) { bstream.add(Self::ID) }
-    fn encode_payload(&self, bstream: &mut BinaryStream);
+    fn encode_payload(&self, _bstream: &mut BinaryStream) { unimplemented!() }
 }
 
 pub trait PacketDecode: Packet {
-    fn decode(_bstream: &mut BinaryStream) -> Self where Self: Sized {
-        unimplemented!()
-    }
+    fn decode(_bstream: &mut BinaryStream) -> Self where Self: Sized;
 }

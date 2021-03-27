@@ -1,7 +1,7 @@
 use std::{net::{ToSocketAddrs, UdpSocket}, time::Instant};
 use crate::utils::BinaryStream;
 
-use crate::protocol::packets::*;
+use crate::protocol::{packets::*, types::Reliability};
 
 pub struct UdpServer {
     address: String,
@@ -57,6 +57,8 @@ impl UdpServer {
                     self.send(reply2, addr)?;
 
                     let elepsed_millis = self.start_time.elapsed().as_millis() as i64;
+                    println!("Encapsulated packet result:");
+                    self.send(FramePacket::new_packet(ConnectedPing::new(elepsed_millis), Reliability::Unreliable), addr)?;
                 }
                 0x80..=0x8d => {
                     println!("Frame set packet");
