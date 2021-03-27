@@ -11,12 +11,19 @@ pub trait Packet {
 }
 
 pub trait PacketEncode: Packet {
+    fn encode_with_buf(&self, bstream: &mut BinaryStream)
+    where Self: Sized
+    {
+        self.encode_header(bstream);
+        self.encode_payload(bstream);
+    }
+
     fn encode(&self) -> BinaryStream
     where Self: Sized
     {
         let mut bstream = BinaryStream::with_len(1 + self.packet_size());
-        self.encode_header(&mut bstream);
-        self.encode_payload(&mut bstream);
+        
+        self.encode_with_buf(&mut bstream);
 
         bstream
     }

@@ -55,6 +55,7 @@ impl UdpServer {
                     let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
                     self.send(reply2, addr)?;
+
                     let elepsed_millis = self.start_time.elapsed().as_millis() as i64;
                 }
                 0x80..=0x8d => {
