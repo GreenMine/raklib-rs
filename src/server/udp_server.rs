@@ -1,7 +1,7 @@
 use std::{net::{ToSocketAddrs, UdpSocket}, time::Instant};
 use crate::utils::BinaryStream;
 
-use crate::protocol::{packets::*, types::Reliability};
+use crate::protocol::{packets::*, types::{Reliability, U24}};
 
 pub struct UdpServer {
     address: String,
@@ -19,6 +19,9 @@ impl UdpServer {
     }
 
     pub fn run(&mut self) -> std::io::Result<()> {
+        let u24_number = U24::from(0xAABBCCu32);
+        println!("u24 number: {:?}", u24_number);
+
         let mut bstream = BinaryStream::with_len(2048);
 
         println!("RakNet connection opened on {}", self.address);
@@ -58,7 +61,7 @@ impl UdpServer {
 
                     let elepsed_millis = self.start_time.elapsed().as_millis() as i64;
                     println!("Encapsulated packet result:");
-                    self.send(FramePacket::new_packet(ConnectedPing::new(elepsed_millis), Reliability::Unreliable), addr)?;
+                    self.send(FramePacket::from_packet(ConnectedPing::new(elepsed_millis), Reliability::Unreliable), addr)?;
                 }
                 0x80..=0x8d => {
                     println!("Frame set packet");

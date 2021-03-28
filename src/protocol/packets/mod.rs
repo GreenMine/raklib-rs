@@ -5,6 +5,7 @@ mod offline_packets;
 mod open_connection_packets;
 mod connected_packets;
 mod frame_packet;
+mod datagram;
 
 pub use offline_packets::*;
 pub use open_connection_packets::*;

@@ -1,6 +1,6 @@
 use std::{net::{IpAddr, Ipv4Addr, SocketAddr}, unimplemented};
 
-use crate::protocol::{packets::PacketDecode, types::{Magic, RakNetString}};
+use crate::protocol::{packets::PacketDecode, types::{Magic, RakNetString, U24}};
 
 
 pub struct BinaryStream {
@@ -80,6 +80,10 @@ impl BinaryStream {
 
 //Env
 impl BinaryStream {
+    pub fn add_uint24le(&mut self, num: U24) {
+        self.add_slice(&num.data[..]);
+    }
+
     pub fn add_string(&mut self, string: &RakNetString) {
         self.add(string.length);
         self.add_slice(string.data);
