@@ -30,9 +30,10 @@ impl PacketEncode for FramePacket {
    fn encode_with_buf(&self, bstream: &mut BinaryStream) {
       bstream.add(((self.reliabillity as u8) << 5) | 0u8);
       bstream.add((self.size as u16) << 3);
-      if self.reliabillity.is_reliable()                                   { unimplemented!("realiable packet"); }
-      if self.reliabillity.is_sequenced()                                  { unimplemented!("sequenced packet"); }
-      if self.reliabillity.is_sequenced() | self.reliabillity.is_ordered() { unimplemented!("sequenced or ordered packet"); }
+      if self.reliabillity.is_reliable()  { unimplemented!("realiable packet"); }
+      if self.reliabillity.is_sequenced() { unimplemented!("sequenced packet"); }
+      if self.reliabillity.is_sequenced() |
+         self.reliabillity.is_ordered()   { unimplemented!("sequenced or ordered packet"); }
       //TODO: has split implementation
 
       bstream.add_slice(&self.buffer[..]);

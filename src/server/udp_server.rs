@@ -61,7 +61,11 @@ impl UdpServer {
 
                     let elepsed_millis = self.start_time.elapsed().as_millis() as i64;
                     println!("Encapsulated packet result:");
-                    self.send(FramePacket::from_packet(ConnectedPing::new(elepsed_millis), Reliability::Unreliable), addr)?;
+                    self.send(Datagram { seq_number: U24::from(0u32), packets: vec![
+                                        FramePacket::from_packet(
+                                            ConnectedPing::new(elepsed_millis),
+                                            Reliability::Unreliable)]
+                                    }, addr)?;
                 }
                 0x80..=0x8d => {
                     println!("Frame set packet");
