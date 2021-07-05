@@ -2,7 +2,7 @@ use super::{Packet, PacketEncode};
 use crate::utils::BinaryStream;
 
 pub struct ConnectedPing {
-    elepsed_time_ms: i64
+    elepsed_time_ms: i64,
 }
 
 impl ConnectedPing {

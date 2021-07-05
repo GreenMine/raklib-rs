@@ -1,14 +1,19 @@
-use std::{net::{IpAddr, Ipv4Addr, SocketAddr}, unimplemented};
+use std::{
+    net::{IpAddr, Ipv4Addr, SocketAddr},
+    unimplemented,
+};
 
-use crate::protocol::{packets::PacketDecode, types::{Magic, RakNetString, U24}};
-
+use crate::protocol::{
+    packets::PacketDecode,
+    types::{Magic, RakNetString, U24},
+};
 
 pub struct BinaryStream {
     pub data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
-    p: usize
+    p: usize,
 }
 
-//TODO: Always converted from big-endian to little-endian and vice versa for reading and sending 
+//TODO: Always converted from big-endian to little-endian and vice versa for reading and sending
 
 //New
 impl BinaryStream {
@@ -17,7 +22,7 @@ impl BinaryStream {
     }
 
     pub fn new(vec: Vec<u8>) -> Self {
-        Self {data: vec, p : 0}
+        Self { data: vec, p: 0 }
     }
 }
 
@@ -25,7 +30,10 @@ impl BinaryStream {
 impl BinaryStream {
     pub fn add<T>(&mut self, mut data: T) {
         unsafe {
-            let slice = std::slice::from_raw_parts_mut((&mut data as *mut T) as *mut u8, std::mem::size_of::<T>());
+            let slice = std::slice::from_raw_parts_mut(
+                (&mut data as *mut T) as *mut u8,
+                std::mem::size_of::<T>(),
+            );
             slice.reverse();
             self.add_slice(slice)
         }
@@ -42,10 +50,8 @@ impl BinaryStream {
 impl BinaryStream {
     pub fn read<T: Copy>(&mut self) -> T {
         let res = self.read_slice_be(std::mem::size_of::<T>());
-        
-        unsafe {
-            *(res.as_ptr() as *const T)
-        }
+
+        unsafe { *(res.as_ptr() as *const T) }
     }
 
     pub fn read_slice_be(&mut self, n: usize) -> &[u8] {
@@ -98,7 +104,7 @@ impl BinaryStream {
 
         self.add_slice(&match address.ip() {
             IpAddr::V4(addr) => addr.octets(),
-            IpAddr::V6(_addr) => unimplemented!() 
+            IpAddr::V6(_addr) => unimplemented!(),
         });
 
         self.add(address.port());
@@ -109,17 +115,25 @@ impl BinaryStream {
         let len = self.read();
         RakNetString {
             length: len,
-            data: self.read_slice(len as usize)
+            data: self.read_slice(len as usize),
         }
     }
 
     pub fn read_magic(&mut self) -> Magic {
-        unsafe {*(self.read_slice(16).as_ptr() as *const Magic)}
+        unsafe { *(self.read_slice(16).as_ptr() as *const Magic) }
     }
 
     //FIXME: only IPv4
     pub fn read_address(&mut self) -> SocketAddr {
         self.skip(1);
-        SocketAddr::new(IpAddr::V4(Ipv4Addr::new(self.read(), self.read(), self.read(), self.read())), self.read())
+        SocketAddr::new(
+            IpAddr::V4(Ipv4Addr::new(
+                self.read(),
+                self.read(),
+                self.read(),
+                self.read(),
+            )),
+            self.read(),
+        )
     }
 }

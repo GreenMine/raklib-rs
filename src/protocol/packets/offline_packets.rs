@@ -1,10 +1,16 @@
-use super::{Packet, PacketEncode, PacketDecode};
-use crate::{protocol::{types::{Magic, RakNetString}, consts}, utils::BinaryStream};
+use super::{Packet, PacketDecode, PacketEncode};
+use crate::{
+    protocol::{
+        consts,
+        types::{Magic, RakNetString},
+    },
+    utils::BinaryStream,
+};
 
 pub struct OfflinePingPacket {
     pub time: u64,
     pub magic: Magic,
-    pub client_guid: u64
+    pub client_guid: u64,
 }
 
 impl Packet for OfflinePingPacket {
@@ -16,25 +22,30 @@ impl PacketDecode for OfflinePingPacket {
         OfflinePingPacket {
             time: bstream.read(),
             magic: bstream.read_magic(),
-            client_guid: bstream.read()
+            client_guid: bstream.read(),
         }
     }
 }
 
 pub struct OfflinePongPacket<'a> {
     pub time: u64,
-    pub server_id_string: RakNetString<'a>
+    pub server_id_string: RakNetString<'a>,
 }
 
 impl<'a> OfflinePongPacket<'a> {
     pub fn new(time: u64, server_id_string: &'a String) -> Self {
-        Self { time, server_id_string: RakNetString::from_string(server_id_string) }
+        Self {
+            time,
+            server_id_string: RakNetString::from_string(server_id_string),
+        }
     }
 }
 
 impl<'a> Packet for OfflinePongPacket<'a> {
     const ID: u8 = 0x1c;
-    fn packet_size(&self) -> usize { 1 + 8 + 8 + 16 + (2 + self.server_id_string.length as usize) }
+    fn packet_size(&self) -> usize {
+        1 + 8 + 8 + 16 + (2 + self.server_id_string.length as usize)
+    }
 }
 
 impl<'a> PacketEncode for OfflinePongPacket<'a> {
