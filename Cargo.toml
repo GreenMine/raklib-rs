@@ -1,5 +1,5 @@
 [package]
-name = "RakLib"
+name = "raklib"
 version = "0.1.0"
 authors = ["green"]
 edition = "2018"
