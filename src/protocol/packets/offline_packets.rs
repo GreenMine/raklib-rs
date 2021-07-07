@@ -33,7 +33,7 @@ pub struct OfflinePongPacket<'a> {
 }
 
 impl<'a> OfflinePongPacket<'a> {
-    pub fn new(time: u64, server_id_string: &'a String) -> Self {
+    pub fn new(time: u64, server_id_string: &'a str) -> Self {
         Self {
             time,
             server_id_string: RakNetString::from_string(server_id_string),

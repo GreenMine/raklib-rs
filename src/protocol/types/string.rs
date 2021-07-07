@@ -6,7 +6,8 @@ pub struct RakNetString<'a> {
 }
 
 impl<'a> RakNetString<'a> {
-    pub fn from_string(string: &'a String) -> Self {
+    pub fn from_string(string: &'a str) -> Self {
+        assert!(string.is_ascii()); //FIXME
         Self {
             length: string.len() as u16,
             data: string.as_bytes(),

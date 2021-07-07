@@ -8,18 +8,14 @@ use crate::{
 };
 
 pub struct FramePacket {
-    buffer: Vec<u8>,
+    buffer: Vec<u8>, //TODO: dyn? bibleThump
     reliabillity: Reliability,
     size: usize,
 }
 
 impl FramePacket {
     pub fn from_packet<T: PacketEncode>(data: T, reliabillity: Reliability) -> Self {
-        Self {
-            size: data.packet_size(),
-            buffer: data.encode().data,
-            reliabillity,
-        }
+        Self::from_raw(data.encode(), reliabillity)
     }
 
     pub fn from_raw(data: Vec<u8>, reliabillity: Reliability) -> Self {
@@ -57,6 +53,6 @@ impl PacketEncode for FramePacket {
         }
         //TODO: has split implementation
 
-        bstream.add_slice(&self.buffer[..]);
+        bstream.add_slice(&self.buffer[..]); //FIXME: OH NO, EXCESS memcpy
     }
 }

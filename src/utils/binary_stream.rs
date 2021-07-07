@@ -82,6 +82,14 @@ impl BinaryStream {
     pub fn decode<T: PacketDecode>(&mut self) -> T {
         T::decode(self)
     }
+
+    pub fn get_raw(&self) -> &[u8] {
+        &self.data[..]
+    }
+
+    pub fn get_raw_mut(&mut self) -> &mut [u8] {
+        &mut self.data[..]
+    }
 }
 
 //Env

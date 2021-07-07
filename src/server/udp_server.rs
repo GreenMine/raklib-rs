@@ -1,4 +1,4 @@
-use crate::{server::session, utils::BinaryStream};
+use crate::{protocol::packets::*, utils::BinaryStream};
 use std::{
     collections::HashMap,
     net::{SocketAddr, ToSocketAddrs, UdpSocket},
@@ -6,10 +6,6 @@ use std::{
 };
 
 use super::{Session, Sessions};
-use crate::protocol::{
-    packets::*,
-    types::{Reliability, U24},
-};
 
 pub struct UdpServer {
     address: String,
@@ -37,7 +33,7 @@ impl UdpServer {
         loop {
             let (readed_bytes, addr) = self
                 .socket
-                .recv_from(&mut bstream.data[..])
+                .recv_from(bstream.get_raw_mut())
                 .expect("no date received!");
             let packet_id = bstream.read::<u8>();
             match packet_id {
@@ -53,7 +49,7 @@ impl UdpServer {
         packet: T,
         addr: A,
     ) -> std::io::Result<usize> {
-        self.socket.send_to(&packet.encode().data[..], addr)
+        self.socket.send_to(packet.encode().get_raw(), addr)
     }
 
     pub(super) fn print_binary(bin: &[u8]) {

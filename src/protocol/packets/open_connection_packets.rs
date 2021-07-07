@@ -44,7 +44,7 @@ impl Packet for FirstOpenConnectionReply {
     const ID: u8 = 0x06;
 
     fn packet_size(&self) -> usize {
-        1 + 16 + 8 + 1 + 2
+        1 + 16 + 8 + 1 + 2 // packet id + magic + server_guid + use security + mtu lenght
     }
 }
 
@@ -98,7 +98,7 @@ impl SecondOpenConnectionReply {
 impl Packet for SecondOpenConnectionReply {
     const ID: u8 = 0x08;
     fn packet_size(&self) -> usize {
-        1 + 16 + 8 + 7 + 2 + 1
+        1 + 16 + 8 + 7 + 2 + 1 // packet id + magic + server guid + client address + mtu length + ecryption
     }
 }
 
