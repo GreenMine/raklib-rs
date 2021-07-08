@@ -10,17 +10,15 @@ use crate::{
 pub struct FramePacket {
     buffer: Vec<u8>, //TODO: dyn? bibleThump
     reliabillity: Reliability,
-    size: usize,
 }
 
 impl FramePacket {
     pub fn from_packet<T: PacketEncode>(data: T, reliabillity: Reliability) -> Self {
-        Self::from_raw(data.encode(), reliabillity)
+        Self::from_raw(data.encode().data, reliabillity)
     }
 
     pub fn from_raw(data: Vec<u8>, reliabillity: Reliability) -> Self {
         Self {
-            size: data.len(),
             buffer: data,
             reliabillity,
         }
@@ -34,14 +32,14 @@ impl Packet for FramePacket {
     where
         Self: Sized,
     {
-        1 + 2 + self.size // TODO: Reliable, sequenced and ordered length
+        1 + 2 + self.buffer.len() // TODO: Reliable, sequenced and ordered length
     }
 }
 
 impl PacketEncode for FramePacket {
     fn encode_with_buf(&self, bstream: &mut BinaryStream) {
         bstream.add(((self.reliabillity as u8) << 5) | 0u8);
-        bstream.add((self.size as u16) << 3);
+        bstream.add((self.buffer.len() as u16) << 3);
         if self.reliabillity.is_reliable() {
             unimplemented!("realiable packet");
         }
