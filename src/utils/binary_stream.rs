@@ -7,7 +7,7 @@ pub struct BinaryStream {
     p: usize,
 }
 
-//TODO: Always converted from big-endian to little-endian and vice versa for reading and sending
+//TODO: Always converting from big-endian to little-endian and vice versa for reading and sending
 
 //New
 impl BinaryStream {

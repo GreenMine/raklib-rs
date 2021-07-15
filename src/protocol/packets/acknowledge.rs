@@ -1,3 +1,5 @@
+use std::ops::RangeInclusive;
+
 use crate::{
     protocol::{
         packets::{Packet, PacketDecode},
@@ -9,7 +11,7 @@ use crate::{
 #[derive(Debug)]
 pub enum Record {
     Single(u24),
-    Range((u24, u24)),
+    Range(RangeInclusive<u24>),
 }
 
 #[derive(Debug)]
@@ -35,7 +37,7 @@ impl PacketDecode for Ack {
                 if is_single {
                     Record::Single(bstream.read())
                 } else {
-                    Record::Range((bstream.read(), bstream.read()))
+                    Record::Range(bstream.read()..=bstream.read())
                 }
             })
             .collect();

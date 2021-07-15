@@ -9,7 +9,7 @@ use crate::{
 use super::Server;
 
 impl Server {
-    pub fn unconnected_handler(
+    pub(crate) fn unconnected_handler(
         &mut self,
         packet_id: u8,
         bstream: &mut BinaryStream,
