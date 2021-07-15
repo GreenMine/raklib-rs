@@ -35,10 +35,10 @@ impl Session {
         }
     }
 
-    pub fn handle_ack(&mut self, ack: Ack) {
-        println!("{:#?}", ack);
+    pub fn handle_ack(&mut self, ack_packet: Ack) {
+        println!("{:#?}", ack_packet);
     }
-    pub fn handle_nack<T: PacketDecode>(&mut self, packet: T) {
+    pub fn handle_nack<T: PacketDecode>(&mut self, _nack: T) {
         unimplemented!("handler for NACK packets!");
     }
     pub fn handle_datagram(&mut self, packet: Datagram) {

@@ -1,7 +1,7 @@
 use std::net::SocketAddr;
 
 use crate::{
-    protocol::{consts, packets::*, types::Reliability},
+    protocol::{consts, packets::*},
     server::Session,
     utils::BinaryStream,
 };

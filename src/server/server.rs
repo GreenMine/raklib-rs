@@ -1,14 +1,11 @@
-use crate::{
-    protocol::packets::{Ack, Datagram, PacketDecode},
-    utils::BinaryStream,
-};
+use crate::{protocol::packets::Datagram, utils::BinaryStream};
 use std::{collections::HashMap, net::SocketAddr, rc::Rc, time::Instant};
 
 use super::{Session, Sessions, UdpSocket};
 
 pub struct Server {
     pub(super) socket: Rc<UdpSocket>, // FIXME: fuck RefCounter
-    pub(super) start_time: Instant,
+    pub(super) _start_time: Instant,
     pub(super) sessions: Sessions,
 }
 
@@ -16,7 +13,7 @@ impl Server {
     pub fn new(address: SocketAddr) -> std::io::Result<Self> {
         Ok(Self {
             socket: Rc::new(UdpSocket::bind(address)?),
-            start_time: Instant::now(),
+            _start_time: Instant::now(),
             sessions: HashMap::new(),
         })
     }
