@@ -1,11 +1,5 @@
-use super::{Packet, PacketDecode, PacketEncode};
-use crate::{
-    protocol::{
-        consts,
-        types::{Magic, Reliability},
-    },
-    utils::BinaryStream,
-};
+use super::{Packet, PacketEncode};
+use crate::{protocol::types::Reliability, utils::BinaryStream};
 
 pub struct FramePacket {
     buffer: Vec<u8>, //TODO: dyn? bibleThump

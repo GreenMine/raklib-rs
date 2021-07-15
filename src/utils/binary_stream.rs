@@ -41,7 +41,7 @@ impl BinaryStream {
 
     //FIXME: Check the overflow
     pub fn add_slice(&mut self, slice: &[u8]) {
-        &self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
+        self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
         self.p += slice.len();
     }
 }

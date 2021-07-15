@@ -18,10 +18,7 @@ impl Magic {
 impl Display for Magic {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         write!(f, "0x")?;
-        self.data
-            .iter()
-            .map(|&b| write!(f, "{:02x}", b))
-            .collect::<Result<_, _>>()?;
+        self.data.iter().try_for_each(|b| write!(f, "{:02x}", b))?;
 
         Ok(())
     }

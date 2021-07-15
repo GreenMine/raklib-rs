@@ -7,6 +7,12 @@ pub struct Datagram {
     pub packets: Vec<FramePacket>,
 }
 
+impl Datagram {
+    pub const BITFLAG_VALID: u8 = 0x80;
+    pub const BITFLAG_ACK: u8 = 0x40;
+    pub const BITFLAG_NAK: u8 = 0x20;
+}
+
 impl Packet for Datagram {
     const ID: u8 = 0xFF;
 

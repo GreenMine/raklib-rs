@@ -1,8 +1,10 @@
 mod session;
 pub type Sessions = std::collections::HashMap<std::net::SocketAddr, Session>;
 
-mod udp_server;
+mod server;
+mod udp_socket;
 mod unconnected_handler;
 
+pub use server::Server;
 pub use session::Session;
-pub use udp_server::UdpServer;
+pub(crate) use udp_socket::UdpSocket;
