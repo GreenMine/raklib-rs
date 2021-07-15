@@ -7,4 +7,4 @@ mod uint24;
 pub use magic::Magic;
 pub use reliability::Reliability;
 pub use string::RakNetString;
-pub use uint24::U24;
+pub use uint24::u24;

@@ -1,9 +1,25 @@
-use crate::protocol::consts::MAGIC;
+use crate::{protocol::consts::MAGIC, utils::BSAdapter};
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Magic {
     pub data: [u8; 16],
+}
+
+impl BSAdapter for Magic {
+    fn read(bs: &mut crate::utils::BinaryStream) -> Self
+    where
+        Self: Sized,
+    {
+        unsafe { *(bs.read_slice(16).as_ptr() as *const Magic) }
+    }
+
+    fn add(this: Self, bs: &mut crate::utils::BinaryStream)
+    where
+        Self: Sized,
+    {
+        bs.add_slice(&this.data);
+    }
 }
 
 impl Magic {

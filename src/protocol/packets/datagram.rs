@@ -1,9 +1,9 @@
-use super::{Packet, PacketEncode};
-pub use crate::protocol::{packets::FramePacket, types::U24};
+use super::{Packet, PacketDecode, PacketEncode};
+pub use crate::protocol::{packets::FramePacket, types::u24};
 use crate::utils::BinaryStream;
 
 pub struct Datagram {
-    pub seq_number: U24,
+    pub seq_number: u24,
     pub packets: Vec<FramePacket>,
 }
 
@@ -30,10 +30,19 @@ impl PacketEncode for Datagram {
     }
 
     fn encode_payload(&self, bstream: &mut BinaryStream) {
-        bstream.add_uint24le(self.seq_number);
+        bstream.add(self.seq_number);
 
         for packet in &self.packets {
             packet.encode_with_buf(bstream);
         }
+    }
+}
+
+impl PacketDecode for Datagram {
+    fn decode(_bstream: &mut BinaryStream) -> Self
+    where
+        Self: Sized,
+    {
+        todo!()
     }
 }

@@ -19,7 +19,7 @@ impl Packet for FirstOpenConnectionRequest {
 impl PacketDecode for FirstOpenConnectionRequest {
     fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
-            magic: bstream.read_magic(),
+            magic: bstream.read(),
             protocol_version: bstream.read(),
             mtu_lenght: bstream.data.len() as u16,
         }
@@ -50,7 +50,7 @@ impl Packet for FirstOpenConnectionReply {
 
 impl PacketEncode for FirstOpenConnectionReply {
     fn encode_payload(&self, bstream: &mut BinaryStream) {
-        bstream.add_magic(consts::MAGIC);
+        bstream.add(consts::MAGIC);
         bstream.add(consts::SERVER_GUID);
         bstream.add(self.use_security);
         bstream.add(self.mtu_length);
@@ -71,8 +71,8 @@ impl Packet for SecondOpenConnectionRequest {
 impl PacketDecode for SecondOpenConnectionRequest {
     fn decode(bstream: &mut BinaryStream) -> Self {
         Self {
-            magic: bstream.read_magic(),
-            server_address: bstream.read_address(),
+            magic: bstream.read(),
+            server_address: bstream.read(),
             mtu_length: bstream.read(),
             client_guid: bstream.read(),
         }
@@ -104,9 +104,9 @@ impl Packet for SecondOpenConnectionReply {
 
 impl PacketEncode for SecondOpenConnectionReply {
     fn encode_payload(&self, bstream: &mut BinaryStream) {
-        bstream.add_magic(consts::MAGIC);
+        bstream.add(consts::MAGIC);
         bstream.add(consts::SERVER_GUID);
-        bstream.add_address(self.client_address);
+        bstream.add(self.client_address);
         bstream.add(self.mtu_length);
         bstream.add(self.enctyption);
     }

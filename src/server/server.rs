@@ -40,7 +40,7 @@ impl Server {
                             } else if packet_id & Datagram::BITFLAG_NAK != 0 {
                                 unimplemented!("not acknowledge packet!");
                             } else {
-                                unimplemented!("datagram");
+                                session.handle_datagram(bstream.decode());
                             }
                         }
                     } else {

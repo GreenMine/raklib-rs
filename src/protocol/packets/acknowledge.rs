@@ -1,15 +1,15 @@
 use crate::{
     protocol::{
         packets::{Packet, PacketDecode},
-        types::U24,
+        types::u24,
     },
     utils::BinaryStream,
 };
 
 #[derive(Debug)]
 pub enum Record {
-    Single(U24),
-    Range((U24, U24)),
+    Single(u24),
+    Range((u24, u24)),
 }
 
 #[derive(Debug)]

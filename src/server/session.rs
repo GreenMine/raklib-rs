@@ -1,7 +1,7 @@
 use std::{net::SocketAddr, rc::Rc, time::Instant};
 
 use crate::protocol::{
-    packets::{Ack, ConnectedPing, Datagram, FramePacket, PacketDecode, U24},
+    packets::{u24, Ack, ConnectedPing, Datagram, FramePacket, PacketDecode},
     types::Reliability,
 };
 
@@ -36,11 +36,13 @@ impl Session {
     }
 
     pub fn handle_ack(&mut self, ack_packet: Ack) {
-        println!("{:#?}", ack_packet);
+        println!("Ack packet: {:?}", ack_packet);
     }
+
     pub fn handle_nack<T: PacketDecode>(&mut self, _nack: T) {
         unimplemented!("handler for NACK packets!");
     }
+
     pub fn handle_datagram(&mut self, packet: Datagram) {
         println!("Datagram packets amount: {}", packet.packets.len());
         panic!()
@@ -48,7 +50,7 @@ impl Session {
 
     pub fn ping(&mut self) {
         let datagram = Datagram {
-            seq_number: U24::from(0u32),
+            seq_number: u24::from(0u32),
             packets: vec![FramePacket::from_packet(
                 ConnectedPing::new(0),
                 Reliability::Unreliable,

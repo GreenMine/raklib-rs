@@ -21,7 +21,7 @@ impl PacketDecode for OfflinePingPacket {
     fn decode(bstream: &mut BinaryStream) -> Self {
         OfflinePingPacket {
             time: bstream.read(),
-            magic: bstream.read_magic(),
+            magic: bstream.read(),
             client_guid: bstream.read(),
         }
     }
@@ -52,7 +52,7 @@ impl<'a> PacketEncode for OfflinePongPacket<'a> {
     fn encode_payload(&self, bstream: &mut BinaryStream) {
         bstream.add(self.time);
         bstream.add(consts::SERVER_GUID);
-        bstream.add_magic(consts::MAGIC);
-        bstream.add_string(&self.server_id_string);
+        bstream.add(consts::MAGIC);
+        bstream.add(self.server_id_string); //TODO: Copy?
     }
 }
