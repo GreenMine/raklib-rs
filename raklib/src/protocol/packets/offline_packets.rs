@@ -1,4 +1,4 @@
-use super::{Packet, PacketDecode, PacketEncode};
+use super::{Packet, PacketDecode};
 use crate::{
     protocol::{
         consts,
@@ -27,8 +27,10 @@ impl PacketDecode for OfflinePingPacket {
     }
 }
 
+#[derive(raklib_derive::PacketEncode)]
 pub struct OfflinePongPacket<'a> {
     pub time: u64,
+    #[const_fields(consts::SERVER_GUID, consts::MAGIC)]
     pub server_id_string: RakNetString<'a>,
 }
 
@@ -45,14 +47,5 @@ impl<'a> Packet for OfflinePongPacket<'a> {
     const ID: u8 = 0x1c;
     fn packet_size(&self) -> usize {
         1 + 8 + 8 + 16 + (2 + self.server_id_string.length as usize)
-    }
-}
-
-impl<'a> PacketEncode for OfflinePongPacket<'a> {
-    fn encode_payload(&self, bstream: &mut BinaryStream) {
-        bstream.add(self.time);
-        bstream.add(consts::SERVER_GUID);
-        bstream.add(consts::MAGIC);
-        bstream.add(self.server_id_string); //TODO: Copy?
     }
 }

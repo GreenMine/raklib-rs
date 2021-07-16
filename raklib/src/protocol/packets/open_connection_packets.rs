@@ -1,4 +1,4 @@
-use super::{Packet, PacketDecode, PacketEncode};
+use super::{Packet, PacketDecode};
 use crate::{
     protocol::{consts, types::Magic},
     utils::BinaryStream,
@@ -28,7 +28,7 @@ impl PacketDecode for FirstOpenConnectionRequest {
 
 #[derive(raklib_derive::PacketEncode)]
 pub struct FirstOpenConnectionReply {
-    #[const_field(consts::MAGIC, consts::SERVER_GUID)]
+    #[const_fields(consts::MAGIC, consts::SERVER_GUID)]
     pub use_security: bool,
     pub mtu_length: u16,
 }
@@ -49,15 +49,6 @@ impl Packet for FirstOpenConnectionReply {
         1 + 16 + 8 + 1 + 2 // packet id + magic + server_guid + use security + mtu lenght
     }
 }
-
-/*impl PacketEncode for FirstOpenConnectionReply {
-    fn encode_payload(&self, bstream: &mut BinaryStream) {
-        bstream.add(consts::MAGIC);
-        bstream.add(consts::SERVER_GUID);
-        bstream.add(self.use_security);
-        bstream.add(self.mtu_length);
-    }
-}*/
 
 #[derive(Debug)]
 pub struct SecondOpenConnectionRequest {
@@ -81,7 +72,9 @@ impl PacketDecode for SecondOpenConnectionRequest {
     }
 }
 
+#[derive(raklib_derive::PacketEncode)]
 pub struct SecondOpenConnectionReply {
+    #[const_fields(consts::MAGIC, consts::SERVER_GUID)]
     pub client_address: SocketAddr,
     pub mtu_length: u16,
     pub enctyption: bool,
@@ -101,15 +94,5 @@ impl Packet for SecondOpenConnectionReply {
     const ID: u8 = 0x08;
     fn packet_size(&self) -> usize {
         1 + 16 + 8 + 7 + 2 + 1 // packet id + magic + server guid + client address + mtu length + ecryption
-    }
-}
-
-impl PacketEncode for SecondOpenConnectionReply {
-    fn encode_payload(&self, bstream: &mut BinaryStream) {
-        bstream.add(consts::MAGIC);
-        bstream.add(consts::SERVER_GUID);
-        bstream.add(self.client_address);
-        bstream.add(self.mtu_length);
-        bstream.add(self.enctyption);
     }
 }
