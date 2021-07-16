@@ -1,5 +1,4 @@
-mod packet;
-pub use packet::{Packet, PacketDecode, PacketEncode};
+pub use raklib_std::packet::{Packet, PacketDecode, PacketEncode};
 
 mod acknowledge;
 mod connected_packets;

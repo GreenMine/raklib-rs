@@ -1,4 +1,4 @@
-use crate::protocol::packets::PacketDecode;
+use crate::packet::PacketDecode;
 
 use super::BSAdapter;
 

@@ -26,7 +26,9 @@ impl PacketDecode for FirstOpenConnectionRequest {
     }
 }
 
+#[derive(raklib_derive::PacketEncode)]
 pub struct FirstOpenConnectionReply {
+    #[const_field(consts::MAGIC, consts::SERVER_GUID)]
     pub use_security: bool,
     pub mtu_length: u16,
 }
@@ -48,14 +50,14 @@ impl Packet for FirstOpenConnectionReply {
     }
 }
 
-impl PacketEncode for FirstOpenConnectionReply {
+/*impl PacketEncode for FirstOpenConnectionReply {
     fn encode_payload(&self, bstream: &mut BinaryStream) {
         bstream.add(consts::MAGIC);
         bstream.add(consts::SERVER_GUID);
         bstream.add(self.use_security);
         bstream.add(self.mtu_length);
     }
-}
+}*/
 
 #[derive(Debug)]
 pub struct SecondOpenConnectionRequest {
