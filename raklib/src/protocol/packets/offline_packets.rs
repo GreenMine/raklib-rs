@@ -1,12 +1,10 @@
-use super::{Packet, PacketDecode};
-use crate::{
-    protocol::{
-        consts,
-        types::{Magic, RakNetString},
-    },
-    utils::BinaryStream,
+use super::Packet;
+use crate::protocol::{
+    consts,
+    types::{Magic, RakNetString},
 };
 
+#[derive(raklib_derive::PacketDecode)]
 pub struct OfflinePingPacket {
     pub time: u64,
     pub magic: Magic,
@@ -15,16 +13,6 @@ pub struct OfflinePingPacket {
 
 impl Packet for OfflinePingPacket {
     const ID: u8 = 0x01;
-}
-//TODO: Rewrite it to proc-macro
-impl PacketDecode for OfflinePingPacket {
-    fn decode(bstream: &mut BinaryStream) -> Self {
-        OfflinePingPacket {
-            time: bstream.read(),
-            magic: bstream.read(),
-            client_guid: bstream.read(),
-        }
-    }
 }
 
 #[derive(raklib_derive::PacketEncode)]

@@ -2,13 +2,13 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
 use super::BinaryStream;
 
-pub trait BSAdapter: Copy {
+pub trait BSAdapter: Clone {
     fn read(bs: &mut BinaryStream) -> Self
     where
         Self: Sized,
     {
         let res = bs.read_slice_be(std::mem::size_of::<Self>());
-        unsafe { *(res.as_ptr() as *const Self) }
+        unsafe { (*(res.as_ptr() as *const Self)).clone() } //TODO: later fix it.
     }
 
     fn add(mut this: Self, bs: &mut BinaryStream)
@@ -59,5 +59,21 @@ impl BSAdapter for SocketAddr {
             IpAddr::V4(Ipv4Addr::new(bs.read(), bs.read(), bs.read(), bs.read())),
             bs.read(),
         )
+    }
+}
+
+impl<T: BSAdapter> BSAdapter for Vec<T> {
+    fn add(this: Self, bs: &mut BinaryStream)
+    where
+        Self: Sized,
+    {
+        this.into_iter().for_each(|p| bs.add(p));
+    }
+
+    fn read(bs: &mut BinaryStream) -> Self
+    where
+        Self: Sized,
+    {
+        unimplemented!("read operation for Vec<T>")
     }
 }

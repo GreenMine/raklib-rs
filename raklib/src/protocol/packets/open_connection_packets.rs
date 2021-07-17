@@ -50,7 +50,7 @@ impl Packet for FirstOpenConnectionReply {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, raklib_derive::PacketDecode)]
 pub struct SecondOpenConnectionRequest {
     pub magic: Magic,
     pub server_address: SocketAddr,
@@ -60,16 +60,6 @@ pub struct SecondOpenConnectionRequest {
 
 impl Packet for SecondOpenConnectionRequest {
     const ID: u8 = 0x07;
-}
-impl PacketDecode for SecondOpenConnectionRequest {
-    fn decode(bstream: &mut BinaryStream) -> Self {
-        Self {
-            magic: bstream.read(),
-            server_address: bstream.read(),
-            mtu_length: bstream.read(),
-            client_guid: bstream.read(),
-        }
-    }
 }
 
 #[derive(raklib_derive::PacketEncode)]
