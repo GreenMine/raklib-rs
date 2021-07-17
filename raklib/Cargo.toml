@@ -1,0 +1,9 @@
+[package]
+name = "raklib"
+version = "0.1.0"
+authors = ["GreenMine <greenmine94@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+raklib_std = { path = "../raklib_std" }
+raklib_derive = { path = "../raklib_derive" }
