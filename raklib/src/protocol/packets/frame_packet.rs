@@ -1,5 +1,6 @@
 use super::{Packet, PacketEncode};
-use crate::{protocol::types::Reliability, utils::BinaryStream};
+use crate::protocol::types::Reliability;
+use raklib_std::utils::BinaryStream;
 
 pub struct FramePacket {
     buffer: Vec<u8>, //TODO: dyn? bibleThump

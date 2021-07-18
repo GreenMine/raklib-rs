@@ -1,8 +1,6 @@
 use super::{Packet, PacketDecode};
-use crate::{
-    protocol::{consts, types::Magic},
-    utils::BinaryStream,
-};
+use crate::protocol::{consts, types::Magic};
+use raklib_std::utils::BinaryStream;
 
 use std::net::SocketAddr;
 //TODO: Add prelude?

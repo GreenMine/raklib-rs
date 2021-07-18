@@ -1,6 +1,6 @@
 use super::{Packet, PacketDecode, PacketEncode};
 pub use crate::protocol::{packets::FramePacket, types::u24};
-use crate::utils::BinaryStream;
+use raklib_std::utils::BinaryStream;
 
 pub struct Datagram {
     pub seq_number: u24,

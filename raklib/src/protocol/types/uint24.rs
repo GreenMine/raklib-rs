@@ -1,4 +1,4 @@
-use crate::utils::BSAdapter;
+use raklib_std::utils::{BSAdapter, BinaryStream};
 
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy)]
@@ -7,14 +7,14 @@ pub struct u24 {
 }
 
 impl BSAdapter for u24 {
-    fn read(bs: &mut crate::utils::BinaryStream) -> Self
+    fn read(bs: &mut BinaryStream) -> Self
     where
         Self: Sized,
     {
         unsafe { *(bs.read_slice(3).as_ptr() as *const u24) }
     }
 
-    fn add(this: Self, bs: &mut crate::utils::BinaryStream)
+    fn add(this: Self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {

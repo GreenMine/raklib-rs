@@ -1,12 +1,11 @@
 use std::net::SocketAddr;
 
+use super::Server;
 use crate::{
     protocol::{consts, packets::*},
     server::Session,
-    utils::BinaryStream,
 };
-
-use super::Server;
+use raklib_std::utils::BinaryStream;
 
 impl Server {
     pub(crate) fn unconnected_handler(

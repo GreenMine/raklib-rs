@@ -1,5 +1,3 @@
-pub use raklib_std::utils;
-
 pub mod protocol;
 pub mod server;
 
