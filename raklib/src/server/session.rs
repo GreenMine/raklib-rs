@@ -44,11 +44,15 @@ impl Session {
     }
 
     pub fn handle_datagram(&mut self, packet: Datagram) {
+        packet
+            .packets
+            .iter()
+            .for_each(|p| println!("Got packet 0x{:02X}", p.buffer[0]));
+
         println!("Datagram packets amount: {}", packet.packets.len());
-        panic!()
     }
 
-    pub fn ping(&mut self) {
+    fn ping(&mut self) {
         let datagram = Datagram {
             seq_number: u24::from(0u32),
             packets: vec![FramePacket::from_packet(

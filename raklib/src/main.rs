@@ -1,3 +1,5 @@
+#![feature(macro_attributes_in_derive_output)]
+
 pub mod protocol;
 pub mod server;
 

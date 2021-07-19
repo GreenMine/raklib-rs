@@ -39,10 +39,19 @@ impl PacketEncode for Datagram {
 }
 
 impl PacketDecode for Datagram {
-    fn decode(_bstream: &mut BinaryStream) -> Self
+    fn decode(bstream: &mut BinaryStream) -> Self
     where
         Self: Sized,
     {
-        todo!()
+        let seq_number: u24 = bstream.read();
+        let mut packets = Vec::new();
+        while !bstream.is_end() {
+            packets.push(bstream.decode());
+        }
+
+        Datagram {
+            seq_number,
+            packets,
+        }
     }
 }

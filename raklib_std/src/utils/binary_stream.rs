@@ -62,10 +62,15 @@ impl BinaryStream {
     }
     pub fn clear(&mut self) {
         self.p = 0;
+        self.data.resize(self.data.capacity(), 0u8);
     }
 
     pub fn decode<T: PacketDecode>(&mut self) -> T {
         T::decode(self)
+    }
+
+    pub fn is_end(&self) -> bool {
+        self.p == self.data.len()
     }
 
     pub fn get_raw(&self) -> &[u8] {

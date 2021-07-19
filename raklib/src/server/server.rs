@@ -32,6 +32,7 @@ impl Server {
             //Test architecture, like in PHP RakLib
             for _ in 0..100 {
                 if let Ok((readed_bytes, addr)) = self.socket.recv_from(bstream.get_raw_mut()) {
+                    bstream.data.truncate(readed_bytes);
                     let packet_id = bstream.read::<u8>();
 
                     if packet_id & Datagram::BITFLAG_VALID != 0 {

@@ -1,4 +1,4 @@
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 #[repr(u8)]
 pub enum Reliability {
     Unreliable,
@@ -14,6 +14,9 @@ pub enum Reliability {
 use Reliability::*;
 
 impl Reliability {
+    pub fn from_u8(reliability: u8) -> Self {
+        unsafe { *(&reliability as *const _ as *const Self) }
+    }
     pub fn is_reliable(self) -> bool {
         self == Reliable
             || self == ReliableOrdered

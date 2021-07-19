@@ -70,7 +70,7 @@ impl<T: BSAdapter> BSAdapter for Vec<T> {
         this.into_iter().for_each(|p| bs.add(p));
     }
 
-    fn read(bs: &mut BinaryStream) -> Self
+    fn read(_bs: &mut BinaryStream) -> Self
     where
         Self: Sized,
     {
