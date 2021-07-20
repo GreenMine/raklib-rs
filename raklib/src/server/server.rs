@@ -1,4 +1,4 @@
-use crate::protocol::packets::Datagram;
+use crate::protocol::packets::connected::Datagram;
 use raklib_std::utils::BinaryStream;
 use std::{collections::HashMap, net::SocketAddr, rc::Rc, time::Instant};
 

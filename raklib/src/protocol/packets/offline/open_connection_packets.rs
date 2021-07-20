@@ -1,5 +1,5 @@
-use super::{Packet, PacketDecode};
 use crate::protocol::{consts, types::Magic};
+use raklib_std::packet::{Packet, PacketDecode};
 use raklib_std::utils::BinaryStream;
 
 use std::net::SocketAddr;

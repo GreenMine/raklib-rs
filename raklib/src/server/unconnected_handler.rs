@@ -2,10 +2,10 @@ use std::net::SocketAddr;
 
 use super::Server;
 use crate::{
-    protocol::{consts, packets::*},
+    protocol::{consts, packets::offline::*},
     server::Session,
 };
-use raklib_std::utils::BinaryStream;
+use raklib_std::{packet::Packet, utils::BinaryStream};
 
 impl Server {
     pub(crate) fn unconnected_handler(

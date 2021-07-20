@@ -1,8 +1,8 @@
-use super::Packet;
 use crate::protocol::{
     consts,
     types::{Magic, RakNetString},
 };
+use raklib_std::packet::Packet;
 
 #[derive(raklib_derive::PacketDecode)]
 pub struct OfflinePingPacket {

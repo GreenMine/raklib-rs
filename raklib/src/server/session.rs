@@ -1,9 +1,10 @@
 use std::{net::SocketAddr, rc::Rc, time::Instant};
 
 use crate::protocol::{
-    packets::{u24, Ack, ConnectedPing, Datagram, FramePacket, PacketDecode},
-    types::Reliability,
+    packets::connected::{Ack, ConnectedPing, Datagram, FramePacket},
+    types::{u24, Reliability},
 };
+use raklib_std::packet::PacketDecode;
 
 use super::UdpSocket;
 
@@ -43,13 +44,19 @@ impl Session {
         unimplemented!("handler for NACK packets!");
     }
 
-    pub fn handle_datagram(&mut self, packet: Datagram) {
+    pub fn handle_datagram(&mut self, mut packet: Datagram) {
         packet
             .packets
-            .iter()
-            .for_each(|p| println!("Got packet 0x{:02X}", p.buffer[0]));
-
+            .iter_mut()
+            .for_each(|p| self.handle_framepacket(p));
         println!("Datagram packets amount: {}", packet.packets.len());
+    }
+
+    pub fn handle_framepacket(&mut self, packet: &mut FramePacket) {
+        let bs = &mut packet.buffer;
+        match bs.read::<u8>() {
+            _ => unimplemented!(),
+        }
     }
 
     fn ping(&mut self) {

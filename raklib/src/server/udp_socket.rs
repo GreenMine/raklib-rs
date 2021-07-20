@@ -3,7 +3,7 @@ use std::{
     ops::Deref,
 };
 
-use crate::protocol::packets::PacketEncode;
+use raklib_std::packet::PacketEncode;
 
 pub(crate) struct UdpSocket {
     address: SocketAddr,

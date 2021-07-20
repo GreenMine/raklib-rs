@@ -1,6 +1,9 @@
-use super::{Packet, PacketDecode, PacketEncode};
-pub use crate::protocol::{packets::FramePacket, types::u24};
-use raklib_std::utils::BinaryStream;
+use raklib_std::{
+    packet::{Packet, PacketDecode, PacketEncode},
+    utils::BinaryStream,
+};
+use super::FramePacket;
+use crate::protocol::types::u24;
 
 pub struct Datagram {
     pub seq_number: u24,
@@ -38,6 +41,7 @@ impl PacketEncode for Datagram {
     }
 }
 
+//TODO: iterator?
 impl PacketDecode for Datagram {
     fn decode(bstream: &mut BinaryStream) -> Self
     where

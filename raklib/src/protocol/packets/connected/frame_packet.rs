@@ -1,18 +1,20 @@
-use super::{Packet, PacketEncode};
-use crate::protocol::{packets::u24, types::Reliability};
-use raklib_std::{packet::PacketDecode, utils::BinaryStream};
+use crate::protocol::types::{u24, Reliability};
+use raklib_std::{
+    packet::{Packet, PacketDecode, PacketEncode},
+    utils::BinaryStream,
+};
 
 pub struct FramePacket {
-    pub buffer: Vec<u8>, //TODO: dyn? bibleThump
+    pub buffer: BinaryStream, //TODO: dyn? bibleThump
     pub reliability: Reliability,
 }
 
 impl FramePacket {
     pub fn from_packet<T: PacketEncode>(data: T, reliability: Reliability) -> Self {
-        Self::from_raw(data.encode().data, reliability)
+        Self::from_raw(data.encode(), reliability)
     }
 
-    pub fn from_raw(data: Vec<u8>, reliability: Reliability) -> Self {
+    pub fn from_raw(data: BinaryStream, reliability: Reliability) -> Self {
         Self {
             buffer: data,
             reliability,
@@ -27,14 +29,14 @@ impl Packet for FramePacket {
     where
         Self: Sized,
     {
-        1 + 2 + self.buffer.len() // TODO: Reliable, sequenced and ordered length
+        1 + 2 + self.buffer.data.len() // TODO: Reliable, sequenced and ordered length
     }
 }
 
 impl PacketEncode for FramePacket {
     fn encode_with_buf(&self, bstream: &mut BinaryStream) {
         bstream.add(((self.reliability as u8) << 5) | 0u8);
-        bstream.add((self.buffer.len() as u16) << 3);
+        bstream.add((self.buffer.data.len() as u16) << 3);
         if self.reliability.is_reliable() {
             unimplemented!("realiable packet");
         }
@@ -46,7 +48,7 @@ impl PacketEncode for FramePacket {
         }
         //TODO: has split implementation
 
-        bstream.add_slice(&self.buffer[..]); //FIXME: OH NO, EXCESS memcpy
+        bstream.add_slice(&self.buffer.data[..]); //FIXME: OH NO, EXCESS memcpy
     }
 }
 
@@ -79,7 +81,7 @@ impl PacketDecode for FramePacket {
         let byte_lenght = (bit_length as f32 / 8.0).ceil() as usize;
 
         FramePacket {
-            buffer: bstream.read_slice(byte_lenght).to_vec(),
+            buffer: BinaryStream::new(bstream.read_slice(byte_lenght).to_vec()),
             reliability,
         }
     }

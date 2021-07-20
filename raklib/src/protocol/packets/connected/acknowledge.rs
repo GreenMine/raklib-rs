@@ -1,10 +1,10 @@
 use std::ops::RangeInclusive;
 
-use crate::protocol::{
-    packets::{Packet, PacketDecode},
-    types::u24,
+use crate::protocol::types::u24;
+use raklib_std::{
+    packet::{Packet, PacketDecode},
+    utils::BinaryStream,
 };
-use raklib_std::utils::BinaryStream;
 
 #[derive(Debug)]
 pub enum Record {
