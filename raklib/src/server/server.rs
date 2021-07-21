@@ -57,7 +57,7 @@ impl Server {
         }
     }
 
-    pub(super) fn print_binary(bin: &[u8]) {
+    pub(crate) fn print_binary(bin: &[u8]) {
         bin.iter().enumerate().for_each(|(i, &b)| {
             print!("0x{:02X} ", b);
             if (i + 1) % 15 == 0 {

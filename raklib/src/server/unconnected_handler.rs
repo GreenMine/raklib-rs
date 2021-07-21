@@ -21,7 +21,7 @@ impl Server {
 
                 let reply = OfflinePongPacket::new(offline_packet.time, consts::SERVER_TITLE);
 
-                self.socket.send(reply, addr)?;
+                self.socket.send(&reply, addr)?;
             }
             FirstOpenConnectionRequest::ID => {
                 println!("Open Connection Request 1");
@@ -29,14 +29,14 @@ impl Server {
                 let request = bstream.decode::<FirstOpenConnectionRequest>();
                 let reply = FirstOpenConnectionReply::new(false, request.mtu_lenght);
 
-                self.socket.send(reply, addr)?;
+                self.socket.send(&reply, addr)?;
             }
             SecondOpenConnectionRequest::ID => {
                 println!("Open Connection Request 2");
                 let request2 = bstream.decode::<SecondOpenConnectionRequest>();
                 let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
-                self.socket.send(reply2, addr)?;
+                self.socket.send(&reply2, addr)?;
 
                 println!("Create new session for {}!", addr);
                 let session = Session::new(addr, self.socket.clone());

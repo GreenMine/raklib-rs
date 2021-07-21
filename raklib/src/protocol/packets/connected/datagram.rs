@@ -1,9 +1,11 @@
+use std::ops::{Deref, DerefMut};
+
+use super::FramePacket;
+use crate::protocol::types::{u24, Reliability};
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
     utils::BinaryStream,
 };
-use super::FramePacket;
-use crate::protocol::types::u24;
 
 pub struct Datagram {
     pub seq_number: u24,
@@ -14,6 +16,18 @@ impl Datagram {
     pub const BITFLAG_VALID: u8 = 0x80;
     pub const BITFLAG_ACK: u8 = 0x40;
     pub const BITFLAG_NAK: u8 = 0x20;
+
+    pub fn new() -> Self {
+        Self {
+            seq_number: u24::from(0),
+            packets: Vec::new(),
+        }
+    }
+
+    pub fn push<T: PacketEncode>(&mut self, packet: T, reliability: Reliability) {
+        self.packets
+            .push(FramePacket::from_packet(packet, reliability));
+    }
 }
 
 impl Packet for Datagram {

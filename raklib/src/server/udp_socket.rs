@@ -26,7 +26,7 @@ impl UdpSocket {
 
     pub(crate) fn send<T: PacketEncode, A: ToSocketAddrs>(
         &self,
-        packet: T,
+        packet: &T,
         addr: A,
     ) -> std::io::Result<usize> {
         self.socket.send_to(packet.encode().get_raw(), addr)

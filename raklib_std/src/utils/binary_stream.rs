@@ -4,7 +4,7 @@ use super::BSAdapter;
 
 pub struct BinaryStream {
     pub data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
-    p: usize,
+    pub p: usize,      //FIXME: delete PUB
 }
 
 //TODO: Always converting from big-endian to little-endian and vice versa for reading and sending
@@ -66,7 +66,9 @@ impl BinaryStream {
     }
 
     pub fn decode<T: PacketDecode>(&mut self) -> T {
-        T::decode(self)
+        let res = T::decode(self);
+
+        res
     }
 
     pub fn is_end(&self) -> bool {

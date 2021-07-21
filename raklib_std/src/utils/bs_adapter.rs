@@ -26,12 +26,13 @@ pub trait BSAdapter: Clone {
     }
 }
 
-impl BSAdapter for u8 {}
-impl BSAdapter for u16 {}
-impl BSAdapter for u32 {}
-impl BSAdapter for u64 {}
-impl BSAdapter for i64 {}
-impl BSAdapter for bool {}
+macro_rules! impl_for_base_type {
+    ( $($t:ty),* ) => {
+    $( impl BSAdapter for $t {}) *
+    }
+}
+
+impl_for_base_type! { u8, u16, u32, u64, i64, bool }
 
 impl BSAdapter for SocketAddr {
     fn add(this: Self, bs: &mut crate::utils::BinaryStream)
@@ -62,7 +63,7 @@ impl BSAdapter for SocketAddr {
     }
 }
 
-impl<T: BSAdapter> BSAdapter for Vec<T> {
+/*impl<T: BSAdapter> BSAdapter for Vec<T> {
     fn add(this: Self, bs: &mut BinaryStream)
     where
         Self: Sized,
@@ -76,4 +77,4 @@ impl<T: BSAdapter> BSAdapter for Vec<T> {
     {
         unimplemented!("read operation for Vec<T>")
     }
-}
+}*/

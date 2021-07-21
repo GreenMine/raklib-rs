@@ -69,9 +69,7 @@ pub fn packet_decode(item: TokenStream) -> TokenStream {
         impl #impl_generics raklib_std::packet::PacketDecode for #struct_name #ty_generics #where_clause {
             fn decode(bstream: &mut raklib_std::utils::BinaryStream) -> #struct_name #ty_generics {
                 #result_quote
-                if !bstream.is_end() {
-                    panic!("Packet is not ended, but all structure fields are readed!");
-                }
+                assert_eq!(bstream.p, bstream.data.len());
                 Self { #(#names), * }
             }
         }

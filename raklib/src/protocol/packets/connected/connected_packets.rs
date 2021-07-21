@@ -1,7 +1,6 @@
-use raklib_derive::{PacketDecode, PacketEncode};
 use raklib_std::packet::Packet;
 
-#[derive(PacketEncode)]
+#[derive(raklib_derive::PacketEncode)]
 pub struct ConnectedPing {
     elepsed_time_ms: i64,
 }
@@ -16,12 +15,12 @@ impl Packet for ConnectedPing {
     const ID: u8 = 0x00;
 }
 
-#[derive(PacketDecode)]
-pub struct ConnectionRequest {
-    pub guid: u64,
-    pub time: i64,
+#[derive(raklib_derive::PacketDecode)]
+pub struct ConnectedPong {
+    pub ping_time: i64,
+    pub pong_time: i64,
 }
 
-impl Packet for ConnectionRequest {
-    const ID: u8 = 0x09;
+impl Packet for ConnectedPong {
+    const ID: u8 = 0x03;
 }

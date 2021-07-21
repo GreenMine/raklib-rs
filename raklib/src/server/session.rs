@@ -1,16 +1,17 @@
 use std::{net::SocketAddr, rc::Rc, time::Instant};
 
 use crate::protocol::{
-    packets::connected::{Ack, ConnectedPing, Datagram, FramePacket},
+    packets::connected::*,
     types::{u24, Reliability},
 };
-use raklib_std::packet::PacketDecode;
+use raklib_std::packet::{Packet, PacketDecode};
 
 use super::UdpSocket;
 
 pub struct Session {
     address: SocketAddr,
     socket: Rc<UdpSocket>,
+    datagram: Datagram,
     last_ping_time: Instant,
 }
 
@@ -19,6 +20,7 @@ impl Session {
         let mut session = Session {
             address,
             socket,
+            datagram: Datagram::new(),
             last_ping_time: Instant::now(),
         };
         session.ping();
@@ -30,6 +32,12 @@ impl Session {
 impl Session {
     pub fn update(&mut self) {
         //TODO
+        if !self.datagram.packets.is_empty() {
+            self.socket.send(&self.datagram, self.address).unwrap();
+
+            //self.datagram.seq_number += 1;
+            self.datagram.packets.clear();
+        }
 
         if self.last_ping_time.elapsed().as_secs() > 5 {
             self.ping();
@@ -54,22 +62,31 @@ impl Session {
 
     pub fn handle_framepacket(&mut self, packet: &mut FramePacket) {
         let bs = &mut packet.buffer;
-        match bs.read::<u8>() {
-            _ => unimplemented!(),
+        let packet_id = bs.read::<u8>();
+        match packet_id {
+            ConnectionRequest::ID => {
+                println!("Connection request");
+                let packet = bs.decode::<ConnectionRequest>();
+                self.datagram.push(
+                    ConnectionRequestAccepted::new(self.address, packet.time, 0),
+                    Reliability::Unreliable,
+                );
+            }
+            ConnectedPong::ID => {
+                println!("Pong goted!");
+            }
+            NewIncomingConnection::ID => {
+                let packet = bs.decode::<NewIncomingConnection>();
+                println!("{:#?}", packet);
+                println!("Successfully connected client!");
+            }
+            _ => unimplemented!("connected 0x{:02X} packet!", packet_id),
         }
     }
 
     fn ping(&mut self) {
-        let datagram = Datagram {
-            seq_number: u24::from(0u32),
-            packets: vec![FramePacket::from_packet(
-                ConnectedPing::new(0),
-                Reliability::Unreliable,
-            )],
-        };
-
-        self.socket.send(datagram, self.address).unwrap();
-        println!("Ping!");
+        self.datagram
+            .push(ConnectedPing::new(0), Reliability::Unreliable);
 
         self.last_ping_time = Instant::now();
     }
