@@ -75,6 +75,10 @@ impl BinaryStream {
         self.p == self.data.len()
     }
 
+    pub fn get_offset(&self) -> usize {
+        self.p
+    }
+
     pub fn get_raw(&self) -> &[u8] {
         &self.data[..]
     }

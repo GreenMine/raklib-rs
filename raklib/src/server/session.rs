@@ -72,6 +72,13 @@ impl Session {
                     Reliability::Unreliable,
                 );
             }
+            ConnectedPing::ID => {
+                let packet = bs.decode::<ConnectedPing>();
+                self.datagram.push(
+                    ConnectedPong::new(packet.elepsed_time_ms, 0),
+                    Reliability::Unreliable,
+                );
+            }
             ConnectedPong::ID => {
                 println!("Pong goted!");
             }
