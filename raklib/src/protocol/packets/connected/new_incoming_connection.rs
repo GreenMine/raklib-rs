@@ -1,3 +1,4 @@
+use crate::*;
 use std::net::SocketAddr;
 
 use raklib_std::packet::{Packet, PacketDecode};
@@ -21,10 +22,10 @@ impl PacketDecode for NewIncomingConnection {
         let server_address: SocketAddr = bstream.read();
 
         let sys_addresses: Vec<_> = (0..20).map(|_| bstream.read::<SocketAddr>()).collect();
-        println!("System addreses: {:?}", sys_addresses);
+        debug!("System addresses: {:?}", sys_addresses);
 
-        let ping_time: i64 = dbg!(bstream.read());
-        let pong_time: i64 = dbg!(bstream.read());
+        let _ping_time: i64 = bstream.read();
+        let _pong_time: i64 = bstream.read();
 
         Self {
             server_address,

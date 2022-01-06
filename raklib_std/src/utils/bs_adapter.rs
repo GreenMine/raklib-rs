@@ -32,7 +32,7 @@ macro_rules! impl_for_base_type {
     }
 }
 
-impl_for_base_type! { u8, u16, u32, u64, i64, bool }
+impl_for_base_type! { u8, u16, u32, u64, i16, i32, i64, bool }
 
 impl BSAdapter for SocketAddr {
     fn add(this: Self, bs: &mut crate::utils::BinaryStream)

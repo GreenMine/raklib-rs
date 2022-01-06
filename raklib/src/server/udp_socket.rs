@@ -1,3 +1,4 @@
+use crate::*;
 use std::{
     net::{SocketAddr, ToSocketAddrs, UdpSocket as RawUdpSocket},
     ops::Deref,
@@ -29,6 +30,17 @@ impl UdpSocket {
         packet: &T,
         addr: A,
     ) -> std::io::Result<usize> {
+        {
+            //FIXME: do it only in debug mode
+            let full_packet_name = std::any::type_name_of_val(packet);
+            let packet_name = full_packet_name
+                .split("::")
+                .last()
+                .unwrap_or(full_packet_name);
+
+            debug!("Send {} packet!", packet_name);
+        }
+
         self.socket.send_to(packet.encode().get_raw(), addr)
     }
 }

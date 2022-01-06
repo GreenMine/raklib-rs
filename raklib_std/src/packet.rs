@@ -4,10 +4,11 @@ pub trait Packet {
     const ID: u8;
 
     fn packet_size(&self) -> usize
+    //TODO: try to do only declare
     where
         Self: Sized,
     {
-        dbg!(std::mem::size_of::<Self>() + 1)
+        std::mem::size_of::<Self>() + 1
     }
 }
 

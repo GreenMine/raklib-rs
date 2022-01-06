@@ -4,6 +4,7 @@ use super::Server;
 use crate::{
     protocol::{consts, packets::offline::*},
     server::Session,
+    *,
 };
 use raklib_std::{packet::Packet, utils::BinaryStream};
 
@@ -13,7 +14,7 @@ impl Server {
         packet_id: u8,
         bstream: &mut BinaryStream,
         addr: SocketAddr,
-        readed_bytes: usize,
+        read_bytes: usize,
     ) -> std::io::Result<()> {
         match packet_id {
             OfflinePingPacket::ID => {
@@ -24,32 +25,33 @@ impl Server {
                 self.socket.send(&reply, addr)?;
             }
             FirstOpenConnectionRequest::ID => {
-                println!("Open Connection Request 1");
-
                 let request = bstream.decode::<FirstOpenConnectionRequest>();
-                let reply = FirstOpenConnectionReply::new(false, request.mtu_lenght);
+                let reply = FirstOpenConnectionReply::new(false, request.mtu_length);
 
                 self.socket.send(&reply, addr)?;
             }
             SecondOpenConnectionRequest::ID => {
-                println!("Open Connection Request 2");
                 let request2 = bstream.decode::<SecondOpenConnectionRequest>();
                 let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
                 self.socket.send(&reply2, addr)?;
 
-                println!("Create new session for {}!", addr);
+                log!("Create new session for {}!", addr);
                 let session = Session::new(addr, self.socket.clone());
                 self.sessions.insert(addr, session);
             }
             0x80..=0x8d => {
-                println!("Frame set packet");
-                Self::print_binary(&bstream.data[..readed_bytes]);
+                error!(
+                    "Frame set packet\n{}",
+                    Self::as_human_read_bin(&bstream.data[..read_bytes])
+                )
             }
             _ => {
-                println!("Unimpelemented packet: 0x{:02X}", packet_id);
-                print!("Readed data: ");
-                Self::print_binary(&bstream.data[..readed_bytes]);
+                error!(
+                    "Unimplemented packet: 0x{:02X}\nRead data:\n{}",
+                    packet_id,
+                    Self::as_human_read_bin(&bstream.data[..read_bytes])
+                );
             }
         }
 

@@ -1,9 +1,17 @@
 use raklib_std::utils::{BSAdapter, BinaryStream};
+use std::ops::{Add, AddAssign};
 
+//FIXME: rewrite u24
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy)]
 pub struct u24 {
     pub data: [u8; 3],
+}
+
+impl u24 {
+    pub fn inc(&mut self) {
+        *self += u24::from(1);
+    }
 }
 
 impl BSAdapter for u24 {
@@ -24,7 +32,7 @@ impl BSAdapter for u24 {
 
 impl From<u32> for u24 {
     fn from(data: u32) -> Self {
-        assert!(data <= 0xFFFFFF, "overflow when convert u32 to u24");
+        assert!(!(data > 0xFFFFFF), "overflow when convert u32 to u24");
 
         let mut array = [0u8; 3];
         let result = unsafe { std::slice::from_raw_parts((&data as *const u32) as *const u8, 4) };
@@ -40,6 +48,20 @@ impl From<u24> for u32 {
         result[0..3].clone_from_slice(&number.data);
 
         unsafe { *(result.as_ptr() as *const u32) }
+    }
+}
+
+impl Add for u24 {
+    type Output = u24;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        u24::from(u32::from(self) + u32::from(rhs))
+    }
+}
+
+impl AddAssign for u24 {
+    fn add_assign(&mut self, rhs: Self) {
+        *self = *self + rhs;
     }
 }
 

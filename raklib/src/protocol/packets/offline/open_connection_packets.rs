@@ -8,7 +8,7 @@ use std::net::SocketAddr;
 pub struct FirstOpenConnectionRequest {
     pub magic: Magic,
     pub protocol_version: u8,
-    pub mtu_lenght: u16,
+    pub mtu_length: u16,
 }
 
 impl Packet for FirstOpenConnectionRequest {
@@ -19,7 +19,7 @@ impl PacketDecode for FirstOpenConnectionRequest {
         Self {
             magic: bstream.read(),
             protocol_version: bstream.read(),
-            mtu_lenght: bstream.data.len() as u16,
+            mtu_length: bstream.data.len() as u16,
         }
     }
 }
@@ -44,7 +44,7 @@ impl Packet for FirstOpenConnectionReply {
     const ID: u8 = 0x06;
 
     fn packet_size(&self) -> usize {
-        1 + 16 + 8 + 1 + 2 // packet id + magic + server_guid + use security + mtu lenght
+        1 + 16 + 8 + 1 + 2 // packet id + magic + server_guid + use security + mtu length
     }
 }
 
@@ -65,22 +65,18 @@ pub struct SecondOpenConnectionReply {
     #[const_fields(consts::MAGIC, consts::SERVER_GUID)]
     pub client_address: SocketAddr,
     pub mtu_length: u16,
-    pub enctyption: bool,
+    pub encryption: bool,
 }
 
 impl SecondOpenConnectionReply {
-    pub fn new(client_address: SocketAddr, mtu_length: u16, enctyption: bool) -> Self {
-        Self {
-            client_address,
-            mtu_length,
-            enctyption,
-        }
+    pub fn new(client_address: SocketAddr, mtu_length: u16, encryption: bool) -> Self {
+        Self { client_address, mtu_length, encryption, }
     }
 }
 
 impl Packet for SecondOpenConnectionReply {
     const ID: u8 = 0x08;
     fn packet_size(&self) -> usize {
-        1 + 16 + 8 + 7 + 2 + 1 // packet id + magic + server guid + client address + mtu length + ecryption
+        1 + 16 + 8 + 7 + 2 + 1 // packet id + magic + server guid + client address + mtu length + encryption
     }
 }

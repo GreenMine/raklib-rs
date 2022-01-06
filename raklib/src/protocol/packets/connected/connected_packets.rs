@@ -4,12 +4,12 @@ use raklib_derive::{PacketDecode, PacketEncode};
 
 #[derive(PacketEncode, PacketDecode)]
 pub struct ConnectedPing {
-    pub elepsed_time_ms: i64,
+    pub elapsed_time_ms: i64,
 }
 
 impl ConnectedPing {
-    pub fn new(elepsed_time_ms: i64) -> Self {
-        Self { elepsed_time_ms }
+    pub fn new(elapsed_time_ms: i64) -> Self {
+        Self { elapsed_time_ms }
     }
 }
 

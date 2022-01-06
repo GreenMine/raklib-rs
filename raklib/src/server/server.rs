@@ -1,6 +1,13 @@
-use crate::protocol::packets::connected::Datagram;
+use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
+use crate::*;
 use raklib_std::utils::BinaryStream;
-use std::{collections::HashMap, net::SocketAddr, rc::Rc, time::Instant};
+use std::{
+    collections::HashMap,
+    net::SocketAddr,
+    rc::Rc,
+    thread,
+    time::{Duration, Instant},
+};
 
 use super::{Session, Sessions, UdpSocket};
 
@@ -22,17 +29,18 @@ impl Server {
     pub fn run(&mut self) -> std::io::Result<()> {
         let mut bstream = BinaryStream::with_len(2048);
 
-        println!(
+        log!(
             "RakNet connection opened on {}",
             self.socket.get_bind_address()
         );
-        println!("Waiting message...");
 
         loop {
+            let tick_start = Instant::now();
+
             //Test architecture, like in PHP RakLib
             for _ in 0..100 {
                 if let Ok((readed_bytes, addr)) = self.socket.recv_from(bstream.get_raw_mut()) {
-                    bstream.data.truncate(readed_bytes);
+                    bstream.data.truncate(readed_bytes); //FIXME: truncate free truncated elements memory block
                     let packet_id = bstream.read::<u8>();
 
                     if packet_id & Datagram::BITFLAG_VALID != 0 {
@@ -53,17 +61,26 @@ impl Server {
                 }
             }
 
-            self.sessions.values_mut().for_each(Session::update);
+            //TODO: stream for loop?
+
+            self.sessions.values_mut().for_each(Session::update); //updates all sessions
+
+            let tick_lead_ms = tick_start.elapsed().as_millis();
+            if tick_lead_ms < TIME_PER_TICK {
+                thread::sleep(Duration::from_millis((TIME_PER_TICK - tick_lead_ms) as u64));
+            }
         }
     }
 
-    pub(crate) fn print_binary(bin: &[u8]) {
+    pub(crate) fn as_human_read_bin(bin: &[u8]) -> String {
+        let mut str = String::new();
         bin.iter().enumerate().for_each(|(i, &b)| {
-            print!("0x{:02X} ", b);
+            str += &format!("0x{:02X} ", b);
             if (i + 1) % 15 == 0 {
-                println!();
+                str += "\n";
             }
         });
-        println!();
+
+        str + "\n"
     }
 }

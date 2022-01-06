@@ -1,4 +1,8 @@
-use crate::protocol::types::{u24, Reliability};
+use crate::protocol::{
+    packets::connected::split_info::SplitInfo,
+    types::{u24, Reliability},
+};
+use crate::*;
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
     utils::BinaryStream,
@@ -7,6 +11,7 @@ use raklib_std::{
 pub struct FramePacket {
     pub buffer: BinaryStream, //TODO: dyn? bibleThump
     pub reliability: Reliability,
+    pub split_info: Option<SplitInfo>,
 }
 
 impl FramePacket {
@@ -18,6 +23,7 @@ impl FramePacket {
         Self {
             buffer: data,
             reliability,
+            split_info: None,
         }
     }
 }
@@ -64,25 +70,28 @@ impl PacketDecode for FramePacket {
         let bit_length = bstream.read::<u16>();
 
         if reliability.is_reliable() {
-            println!("Packet reliable frame index: {}", bstream.read::<u24>());
+            let _ = bstream.read::<u24>(); //debug!("decode: Packet reliable frame index: {}", bstream.read::<u24>())
         }
         if reliability.is_sequenced() {
-            println!("Packet sequence frame index: {}", bstream.read::<u24>())
+            let _ = bstream.read::<u24>(); //debug!("decode: Packet sequence frame index: {}", bstream.read::<u24>())
         }
         if reliability.is_sequenced() || reliability.is_ordered() {
-            println!("Ordered frame index: {}", bstream.read::<u24>());
-            println!("Order channel: {}", bstream.read::<u8>());
+            let _ = bstream.read::<u24>(); //debug!("decode: Ordered frame index: {}", bstream.read::<u24>());
+            let _ = bstream.read::<u8>(); //debug!("decode: Order channel: {}", bstream.read::<u8>());
         }
 
-        if fragmented {
-            unimplemented!("Fragmented packets!");
-        }
+        let split_info: Option<SplitInfo> = if fragmented {
+            Some(bstream.read())
+        } else {
+            None
+        };
 
-        let byte_lenght = (bit_length as f32 / 8.0).ceil() as usize;
+        let byte_length = (bit_length as f32 / 8.0).ceil() as usize;
 
         FramePacket {
-            buffer: BinaryStream::new(bstream.read_slice(byte_lenght).to_vec()),
+            buffer: BinaryStream::new(bstream.read_slice(byte_length).to_vec()), //FIXME: allocate new memory
             reliability,
+            split_info,
         }
     }
 }
