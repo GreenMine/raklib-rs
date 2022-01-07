@@ -1,11 +1,13 @@
-use crate::*;
-use std::{net::SocketAddr, rc::Rc, time::Instant};
-
 use crate::protocol::{
     packets::connected::*,
     types::{u24, Reliability},
 };
+use crate::*;
 use raklib_std::packet::{Packet, PacketDecode};
+use raklib_std::utils::BinaryStream;
+use std::fs::File;
+use std::io::Write;
+use std::{collections::HashMap, net::SocketAddr, rc::Rc, time::Instant};
 
 use super::UdpSocket;
 
@@ -15,6 +17,8 @@ pub struct Session {
     datagram: Datagram,
     last_ping_time: Instant,
     ack_packets: Vec<u24>,
+    _nack_packets: Vec<u24>,
+    split_packets: HashMap<i16, Vec<FramePacket>>,
 }
 
 impl Session {
@@ -25,6 +29,8 @@ impl Session {
             datagram: Datagram::new(),
             last_ping_time: Instant::now(),
             ack_packets: Vec::new(),
+            _nack_packets: Vec::new(),
+            split_packets: HashMap::new(),
         };
         session.ping();
 
@@ -62,21 +68,24 @@ impl Session {
         unimplemented!("handler for NACK packets!");
     }
 
-    pub fn handle_datagram(&mut self, mut packet: Datagram) {
+    pub fn handle_datagram(&mut self, packet: Datagram) {
         self.ack_packets.push(packet.seq_number);
         packet
             .packets
-            .iter_mut()
+            .into_iter()
             .for_each(|p| self.handle_framepacket(p));
     }
 
-    pub fn handle_framepacket(&mut self, packet: &mut FramePacket) {
-        if let Some(info) = packet.split_info {
-            debug!("Split info: {:?}", info);
-            return;
+    pub fn handle_framepacket(&mut self, mut packet: FramePacket) {
+        if let Some(_) = packet.split_info {
+            if let Some(split_result) = self.handle_split(packet) {
+                packet = split_result;
+            } else {
+                return;
+            }
         }
 
-        let bs = &mut packet.buffer;
+        let mut bs = BinaryStream::new(packet.buffer);
         let packet_id = bs.read::<u8>();
         match packet_id {
             ConnectionRequest::ID => {
@@ -98,13 +107,42 @@ impl Session {
                 let _packet = bs.decode::<NewIncomingConnection>();
             }
             0xFE => {
-                debug!(
-                    "Game data packet:\n {}",
-                    server::Server::as_human_read_bin(&bs.data)
-                );
+                std::fs::write("log/game_data.bin", &bs.data[1..]).unwrap();
+                unimplemented!("game packet process");
             }
             _ => unimplemented!("connected 0x{:02X} packet!", packet_id),
         }
+    }
+
+    pub fn handle_split(&mut self, packet: FramePacket) -> Option<FramePacket> {
+        let split_info = &packet.split_info.unwrap();
+
+        //TODO: info verification
+
+        let split_id = split_info.fragment_id;
+
+        let reliability = packet.reliability;
+        let list = self.split_packets.entry(split_id).or_insert(Vec::new());
+        //TODO: Maybe push alternative type of FramePacket, which contains only split info + raw data, because always unwrap split info is kind of mindless
+        list.push(packet);
+
+        if (list.len() as i32) == split_info.fragment_amount {
+            list.sort_by(|a, b| {
+                a.split_info
+                    .unwrap()
+                    .fragment_index
+                    .cmp(&b.split_info.unwrap().fragment_index)
+            });
+
+            let mut buf: Vec<u8> = Vec::new(); //TODO: with_capacity?
+            list.iter().for_each(|p| buf.extend_from_slice(&p.buffer));
+
+            self.split_packets.remove(&split_id); //remove split packet from hashmap
+
+            return Some(FramePacket::from_raw(buf, reliability));
+        }
+
+        None
     }
 
     fn ping(&mut self) {

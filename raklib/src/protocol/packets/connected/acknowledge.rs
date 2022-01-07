@@ -16,6 +16,7 @@ pub enum Record {
 
 #[derive(Debug)]
 pub struct Ack {
+    //FIXME: rewrite data structure
     records: Vec<Record>,
 }
 
