@@ -7,5 +7,6 @@ edition = "2018"
 [dependencies]
 colored = "2.0.0"
 lazy_static = "1.4.0"
+flate2 = { version = "1.0.17", features = ["zlib"], default-features = false }
 raklib_std = { path = "../raklib_std" }
 raklib_derive = { path = "../raklib_derive" }

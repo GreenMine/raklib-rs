@@ -3,10 +3,10 @@ use crate::protocol::{
     types::{u24, Reliability},
 };
 use crate::*;
+use flate2::bufread::ZlibDecoder;
 use raklib_std::packet::{Packet, PacketDecode};
 use raklib_std::utils::BinaryStream;
-use std::fs::File;
-use std::io::Write;
+use std::io::Read;
 use std::{collections::HashMap, net::SocketAddr, rc::Rc, time::Instant};
 
 use super::UdpSocket;
@@ -108,6 +108,7 @@ impl Session {
             }
             0xFE => {
                 std::fs::write("log/game_data.bin", &bs.data[1..]).unwrap();
+
                 unimplemented!("game packet process");
             }
             _ => unimplemented!("connected 0x{:02X} packet!", packet_id),
