@@ -1,6 +1,6 @@
 use crate::packet::PacketDecode;
 
-use super::BSAdapter;
+use super::{BSAdapter, EndOfStream, Result};
 
 pub struct BinaryStream {
     pub data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
@@ -22,14 +22,20 @@ impl BinaryStream {
 
 //Setters
 impl BinaryStream {
-    pub fn add<T: BSAdapter>(&mut self, data: T) {
-        BSAdapter::add(data, self);
+    pub fn add<T: BSAdapter>(&mut self, data: T) -> Result<()> {
+        BSAdapter::add(data, self)
     }
 
     //FIXME: Check the overflow
-    pub fn add_slice(&mut self, slice: &[u8]) {
+    pub fn add_slice(&mut self, slice: &[u8]) -> Result<()> {
+        if self.p + slice.len() > self.data.len() {
+            return Err(EndOfStream {});
+        }
+
         self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
         self.p += slice.len();
+
+        Ok(())
     }
 }
 

@@ -19,7 +19,7 @@ impl BSAdapter for SplitInfo {
         }
     }
 
-    fn add(this: Self, bs: &mut BinaryStream)
+    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::utils::Result<()>
     where
         Self: Sized,
     {

@@ -31,12 +31,14 @@ impl<'a> BSAdapter for RakNetString<'a> {
         unimplemented!("read RakNet string")
     }
 
-    fn add(this: Self, bs: &mut BinaryStream)
+    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::utils::Result<()>
     where
         Self: Sized,
     {
-        bs.add(this.length);
-        bs.add_slice(this.data);
+        bs.add(this.length)?;
+        bs.add_slice(this.data)?;
+
+        Ok(())
     }
 }
 

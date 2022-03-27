@@ -108,7 +108,7 @@ impl PacketEncode for Ack {
             match record {
                 Record::Single(s) => {
                     bstream.add(true);
-                    bstream.add(*s)
+                    bstream.add(*s);
                 }
                 Record::Range(r) => {
                     bstream.add(false);

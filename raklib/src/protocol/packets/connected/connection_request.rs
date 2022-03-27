@@ -52,7 +52,9 @@ impl PacketEncode for ConnectionRequestAccepted {
             SocketAddrV4::from_str("255.255.255.255:19132").unwrap(),
         ))
         .take(20)
-        .for_each(|e| bstream.add(e));
+        .for_each(|e| {
+            bstream.add(e);
+        });
 
         bstream.add(self.request_time);
         bstream.add(self.time);

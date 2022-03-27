@@ -26,7 +26,7 @@ impl BSAdapter for u24 {
         }
     }
 
-    fn add(this: Self, bs: &mut BinaryStream)
+    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::utils::Result<()>
     where
         Self: Sized,
     {
@@ -34,7 +34,7 @@ impl BSAdapter for u24 {
             bs.add_slice(std::slice::from_raw_parts(
                 (&this.num as *const u32) as *const u8,
                 3,
-            ));
+            ))
         }
     }
 }

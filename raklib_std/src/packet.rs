@@ -33,7 +33,7 @@ pub trait PacketEncode: Packet {
     }
 
     fn encode_header(&self, bstream: &mut BinaryStream) {
-        bstream.add(Self::ID)
+        bstream.add(Self::ID);
     }
     fn encode_payload(&self, _bstream: &mut BinaryStream) {
         unimplemented!()
