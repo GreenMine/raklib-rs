@@ -1,5 +1,5 @@
 use crate::protocol::consts::MAGIC;
-use raklib_std::stream::{BSAdapter, BinaryStream};
+use raklib_std::stream::{Adapter, BinaryStream, Result};
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Clone, Copy, Debug)]
@@ -7,15 +7,15 @@ pub struct Magic {
     pub data: [u8; 16],
 }
 
-impl BSAdapter for Magic {
-    fn read(bs: &mut BinaryStream) -> Self
+impl Adapter for Magic {
+    fn read(bs: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
-        unsafe { *(bs.read_slice(16).as_ptr() as *const Magic) }
+        Ok(unsafe { *(bs.read_slice(16)?.as_ptr() as *const Magic) })
     }
 
-    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::stream::Result<()>
+    fn add(this: Self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {

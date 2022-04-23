@@ -1,6 +1,6 @@
 use crate::protocol::{consts, types::Magic};
 use raklib_std::packet::{Packet, PacketDecode};
-use raklib_std::stream::BinaryStream;
+use raklib_std::stream::{BinaryStream, Result};
 
 use std::net::SocketAddr;
 //TODO: Add prelude?
@@ -15,12 +15,12 @@ impl Packet for FirstOpenConnectionRequest {
     const ID: u8 = 0x05;
 }
 impl PacketDecode for FirstOpenConnectionRequest {
-    fn decode(bstream: &mut BinaryStream) -> Self {
-        Self {
-            magic: bstream.read(),
-            protocol_version: bstream.read(),
+    fn decode(bstream: &mut BinaryStream) -> Result<Self> {
+        Ok(Self {
+            magic: bstream.read()?,
+            protocol_version: bstream.read()?,
             mtu_length: bstream.data.len() as u16,
-        }
+        })
     }
 }
 

@@ -84,17 +84,17 @@ impl Session {
         }
 
         let mut bs = BinaryStream::new(packet.buffer);
-        let packet_id = bs.read::<u8>();
+        let packet_id = bs.read::<u8>().unwrap(); //FIXME
         match packet_id {
             ConnectionRequest::ID => {
-                let packet = bs.decode::<ConnectionRequest>();
+                let packet = bs.decode::<ConnectionRequest>().unwrap();
                 self.datagram.push(
                     ConnectionRequestAccepted::new(self.address, packet.time, 0),
                     Reliability::Unreliable,
                 );
             }
             ConnectedPing::ID => {
-                let packet = bs.decode::<ConnectedPing>();
+                let packet = bs.decode::<ConnectedPing>().unwrap();
                 self.datagram.push(
                     ConnectedPong::new(packet.elapsed_time_ms, 0),
                     Reliability::Unreliable,

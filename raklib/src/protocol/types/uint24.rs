@@ -1,4 +1,4 @@
-use raklib_std::stream::{BSAdapter, BinaryStream};
+use raklib_std::stream::{Adapter, BinaryStream, Result};
 use std::ops::{Add, AddAssign};
 
 #[allow(non_camel_case_types)]
@@ -13,20 +13,20 @@ impl u24 {
     }
 }
 
-impl BSAdapter for u24 {
-    fn read(bs: &mut BinaryStream) -> Self
+impl Adapter for u24 {
+    fn read(bs: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
         unsafe {
-            let mut num = *(bs.read_slice(3).as_ptr() as *const u32);
+            let mut num = *(bs.read_slice(3)?.as_ptr() as *const u32);
             num &= 0x00FFFFFF; //xD
 
-            Self { num }
+            Ok(Self { num })
         }
     }
 
-    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::stream::Result<()>
+    fn add(this: Self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {

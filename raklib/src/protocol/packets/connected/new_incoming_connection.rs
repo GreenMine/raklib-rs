@@ -1,7 +1,10 @@
 use crate::*;
 use std::net::SocketAddr;
 
-use raklib_std::packet::{Packet, PacketDecode};
+use raklib_std::{
+    packet::{Packet, PacketDecode},
+    stream::Result,
+};
 
 #[derive(Debug)]
 pub struct NewIncomingConnection {
@@ -15,21 +18,23 @@ impl Packet for NewIncomingConnection {
 
 //FIXME: weird packet
 impl PacketDecode for NewIncomingConnection {
-    fn decode(bstream: &mut raklib_std::stream::BinaryStream) -> Self
+    fn decode(bstream: &mut raklib_std::stream::BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
-        let server_address: SocketAddr = bstream.read();
+        let server_address: SocketAddr = bstream.read()?;
 
-        let sys_addresses: Vec<_> = (0..20).map(|_| bstream.read::<SocketAddr>()).collect();
+        let sys_addresses = (0..20)
+            .map(|_| bstream.read::<SocketAddr>())
+            .collect::<Result<Vec<_>>>()?;
         debug!("System addresses: {:?}", sys_addresses);
 
-        let _ping_time: i64 = bstream.read();
-        let _pong_time: i64 = bstream.read();
+        let _ping_time: i64 = bstream.read()?;
+        let _pong_time: i64 = bstream.read()?;
 
-        Self {
+        Ok(Self {
             server_address,
             internal_address: sys_addresses[0],
-        }
+        })
     }
 }

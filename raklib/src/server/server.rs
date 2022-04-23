@@ -41,16 +41,16 @@ impl Server {
             for _ in 0..100 {
                 if let Ok((readed_bytes, addr)) = self.socket.recv_from(bstream.get_raw_mut()) {
                     bstream.data.truncate(readed_bytes); //FIXME: truncate free truncated elements memory block
-                    let packet_id = bstream.read::<u8>();
+                    let packet_id = bstream.read::<u8>().unwrap();
 
                     if packet_id & Datagram::BITFLAG_VALID != 0 {
                         if let Some(session) = self.sessions.get_mut(&addr) {
                             if packet_id & Datagram::BITFLAG_ACK != 0 {
-                                session.handle_ack(bstream.decode());
+                                session.handle_ack(bstream.decode().unwrap());
                             } else if packet_id & Datagram::BITFLAG_NAK != 0 {
                                 unimplemented!("not acknowledge packet!");
                             } else {
-                                session.handle_datagram(bstream.decode());
+                                session.handle_datagram(bstream.decode().unwrap());
                             }
                         }
                     } else {

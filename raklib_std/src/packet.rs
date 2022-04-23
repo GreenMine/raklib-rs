@@ -41,7 +41,7 @@ pub trait PacketEncode: Packet {
 }
 
 pub trait PacketDecode: Packet {
-    fn decode(_bstream: &mut BinaryStream) -> Self
+    fn decode(_bstream: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized;
 }

@@ -5,7 +5,7 @@ use crate::*;
 use crate::protocol::types::u24;
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
-    stream::BinaryStream,
+    stream::{BinaryStream, Result},
 };
 
 #[derive(Debug, Clone)]
@@ -80,23 +80,23 @@ impl Packet for Ack {
 }
 
 impl PacketDecode for Ack {
-    fn decode(bstream: &mut BinaryStream) -> Self
+    fn decode(bstream: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
-        let record_count = bstream.read::<u16>();
-        let records: Vec<_> = (0..record_count)
+        let record_count = bstream.read::<u16>()?;
+        let records = (0..record_count)
             .map(|_| {
-                let is_single = bstream.read::<bool>();
-                if is_single {
-                    Record::Single(bstream.read())
+                let is_single = bstream.read::<bool>()?;
+                Ok(if is_single {
+                    Record::Single(bstream.read()?)
                 } else {
-                    Record::Range(bstream.read()..=bstream.read())
-                }
+                    Record::Range(bstream.read()?..=bstream.read()?)
+                })
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
-        Self { records }
+        Ok(Self { records })
     }
 }
 

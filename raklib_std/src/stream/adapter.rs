@@ -3,16 +3,16 @@ use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 use super::BinaryStream;
 use super::Result;
 
-pub trait BSAdapter: Clone {
-    fn read(bs: &mut BinaryStream) -> Self
+pub trait Adapter: Clone {
+    fn read(bs: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
-        let res = bs.read_slice_be(std::mem::size_of::<Self>());
-        unsafe { (*(res.as_ptr() as *const Self)).clone() } //TODO: later fix it.
+        let res = bs.read_slice_be(std::mem::size_of::<Self>())?;
+        Ok(unsafe { (*(res.as_ptr() as *const Self)).clone() }) //TODO: later fix it.
     }
 
-    fn add(mut this: Self, bs: &mut BinaryStream) -> Result<()>
+    fn add(mut this: Self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
@@ -29,38 +29,42 @@ pub trait BSAdapter: Clone {
 
 macro_rules! impl_for_base_type {
     ( $($t:ty),* ) => {
-    $( impl BSAdapter for $t {}) *
+    $( impl Adapter for $t {}) *
     }
 }
 
 impl_for_base_type! { u8, u16, u32, u64, i16, i32, i64, bool }
 
-impl BSAdapter for SocketAddr {
+impl Adapter for SocketAddr {
     //FIXME: only IPv4
-    fn read(bs: &mut crate::stream::BinaryStream) -> Self
+    fn read(bs: &mut crate::stream::BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
         bs.skip(1);
-        SocketAddr::new(
-            IpAddr::V4(Ipv4Addr::new(bs.read(), bs.read(), bs.read(), bs.read())),
-            bs.read(),
-        )
+        Ok(SocketAddr::new(
+            IpAddr::V4(Ipv4Addr::new(
+                bs.read::<u8>()?,
+                bs.read()?,
+                bs.read()?,
+                bs.read()?,
+            )),
+            bs.read()?,
+        ))
     }
 
-    fn add(this: Self, bs: &mut crate::stream::BinaryStream) -> Result<()>
+    fn add(this: Self, bs: &mut crate::stream::BinaryStream)
     where
         Self: Sized,
     {
-        bs.add(if this.is_ipv4() { 4u8 } else { 6u8 })?;
+        bs.add(if this.is_ipv4() { 4u8 } else { 6u8 });
 
         bs.add_slice(&match this.ip() {
             IpAddr::V4(addr) => addr.octets(),
             IpAddr::V6(_addr) => unimplemented!(),
-        })?;
+        });
 
-        bs.add(this.port())?;
-        Ok(())
+        bs.add(this.port());
         //from raw parts...............
     }
 }

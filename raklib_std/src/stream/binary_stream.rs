@@ -1,6 +1,6 @@
 use crate::packet::PacketDecode;
 
-use super::{BSAdapter, EndOfStream, Result};
+use super::{Adapter, EndOfStream, Result};
 
 pub struct BinaryStream {
     pub data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
@@ -22,47 +22,48 @@ impl BinaryStream {
 
 //Setters
 impl BinaryStream {
-    pub fn add<T: BSAdapter>(&mut self, data: T) -> Result<()> {
-        BSAdapter::add(data, self)
+    pub fn add<T: Adapter>(&mut self, data: T) {
+        Adapter::add(data, self)
     }
 
-    //FIXME: Check the overflow
-    pub fn add_slice(&mut self, slice: &[u8]) -> Result<()> {
-        if self.p + slice.len() > self.data.len() {
-            return Err(EndOfStream {});
-        }
-
+    //В проверке на переполение нет необходимости,
+    //т.к. если я записываю что-то лишнее, это пробема сервера, а не клиента.
+    //Следовательно, паника будет адекватным решением
+    pub fn add_slice(&mut self, slice: &[u8]) {
         self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
         self.p += slice.len();
-
-        Ok(())
     }
 }
 
 //Getters
 impl BinaryStream {
-    pub fn read<T: BSAdapter>(&mut self) -> T {
+    pub fn read<T: Adapter>(&mut self) -> Result<T> {
         T::read(self)
     }
 
-    pub fn read_slice_be(&mut self, n: usize) -> &[u8] {
-        let res = self.read_slice(n);
+    pub fn read_slice_be(&mut self, n: usize) -> Result<&[u8]> {
+        let res = self.read_slice(n)?;
         res.reverse();
 
-        res
+        Ok(res)
     }
 
     //FIXME: Check the overflow
-    pub fn read_slice(&mut self, n: usize) -> &mut [u8] {
+    pub fn read_slice(&mut self, n: usize) -> Result<&mut [u8]> {
+        if self.p + n > self.data.len() {
+            return Err(EndOfStream {});
+        }
+
         let result = &mut self.data[self.p..self.p + n];
         self.p += n;
 
-        result
+        Ok(result)
     }
 }
 
 //Misc
 impl BinaryStream {
+    //TODO: -> Result<()>
     pub fn skip(&mut self, n: usize) {
         self.p += n;
     }
@@ -71,10 +72,8 @@ impl BinaryStream {
         self.data.resize(self.data.capacity(), 0u8);
     }
 
-    pub fn decode<T: PacketDecode>(&mut self) -> T {
-        let res = T::decode(self);
-
-        res
+    pub fn decode<T: PacketDecode>(&mut self) -> Result<T> {
+        T::decode(self)
     }
 
     pub fn is_end(&self) -> bool {

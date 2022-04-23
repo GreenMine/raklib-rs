@@ -18,20 +18,20 @@ impl Server {
     ) -> std::io::Result<()> {
         match packet_id {
             OfflinePingPacket::ID => {
-                let offline_packet = bstream.decode::<OfflinePingPacket>();
+                let offline_packet = bstream.decode::<OfflinePingPacket>().unwrap();
 
                 let reply = OfflinePongPacket::new(offline_packet.time, consts::SERVER_TITLE);
 
                 self.socket.send(&reply, addr)?;
             }
             FirstOpenConnectionRequest::ID => {
-                let request = bstream.decode::<FirstOpenConnectionRequest>();
+                let request = bstream.decode::<FirstOpenConnectionRequest>().unwrap();
                 let reply = FirstOpenConnectionReply::new(false, request.mtu_length);
 
                 self.socket.send(&reply, addr)?;
             }
             SecondOpenConnectionRequest::ID => {
-                let request2 = bstream.decode::<SecondOpenConnectionRequest>();
+                let request2 = bstream.decode::<SecondOpenConnectionRequest>().unwrap();
                 let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
                 self.socket.send(&reply2, addr)?;

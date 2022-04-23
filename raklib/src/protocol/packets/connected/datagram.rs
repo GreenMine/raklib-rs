@@ -4,7 +4,7 @@ use super::FramePacket;
 use crate::protocol::types::{u24, Reliability};
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
-    stream::BinaryStream,
+    stream::{BinaryStream, Result},
 };
 
 pub struct Datagram {
@@ -57,19 +57,19 @@ impl PacketEncode for Datagram {
 
 //TODO: iterator?
 impl PacketDecode for Datagram {
-    fn decode(bstream: &mut BinaryStream) -> Self
+    fn decode(bstream: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
-        let seq_number: u24 = bstream.read();
+        let seq_number: u24 = bstream.read()?;
         let mut packets = Vec::new();
         while !bstream.is_end() {
-            packets.push(bstream.decode());
+            packets.push(bstream.decode()?);
         }
 
-        Datagram {
+        Ok(Datagram {
             seq_number,
             packets,
-        }
+        })
     }
 }

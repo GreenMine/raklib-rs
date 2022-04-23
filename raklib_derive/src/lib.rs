@@ -61,16 +61,16 @@ pub fn packet_decode(item: TokenStream) -> TokenStream {
         })
         .for_each(|c| {
             result_quote.extend(quote!(
-                let #c = bstream.read();
+                let #c = bstream.read()?;
             ))
         });
 
     let expanded = quote! {
         impl #impl_generics raklib_std::packet::PacketDecode for #struct_name #ty_generics #where_clause {
-            fn decode(bstream: &mut raklib_std::stream::BinaryStream) -> #struct_name #ty_generics {
+            fn decode(bstream: &mut raklib_std::stream::BinaryStream) -> raklib_std::stream::Result<#struct_name #ty_generics> {
                 #result_quote
-                assert_eq!(bstream.p, bstream.data.len());
-                Self { #(#names), * }
+                // assert_eq!(bstream.p, bstream.data.len());
+                Ok(Self { #(#names), * })
             }
         }
     };

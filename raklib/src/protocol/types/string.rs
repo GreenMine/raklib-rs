@@ -1,6 +1,6 @@
 use std::ops::{Index, Range};
 
-use raklib_std::stream::{BSAdapter, BinaryStream};
+use raklib_std::stream::{Adapter, BinaryStream, Result};
 
 #[derive(Clone, Copy)]
 pub struct RakNetString<'a> {
@@ -18,8 +18,8 @@ impl<'a> RakNetString<'a> {
     }
 }
 
-impl<'a> BSAdapter for RakNetString<'a> {
-    fn read(_bs: &mut BinaryStream) -> Self
+impl<'a> Adapter for RakNetString<'a> {
+    fn read(_bs: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
@@ -31,14 +31,12 @@ impl<'a> BSAdapter for RakNetString<'a> {
         unimplemented!("read RakNet string")
     }
 
-    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::stream::Result<()>
+    fn add(this: Self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
-        bs.add(this.length)?;
-        bs.add_slice(this.data)?;
-
-        Ok(())
+        bs.add(this.length);
+        bs.add_slice(this.data);
     }
 }
 
