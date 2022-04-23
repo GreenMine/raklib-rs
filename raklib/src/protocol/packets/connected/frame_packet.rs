@@ -2,10 +2,9 @@ use crate::protocol::{
     packets::connected::split_info::SplitInfo,
     types::{u24, Reliability},
 };
-use crate::*;
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
-    utils::BinaryStream,
+    stream::BinaryStream,
 };
 
 pub struct FramePacket {

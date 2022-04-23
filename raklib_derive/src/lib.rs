@@ -31,7 +31,7 @@ pub fn packet_encode(item: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         impl #impl_generics raklib_std::packet::PacketEncode for #struct_name #ty_generics #where_clause {
-            fn encode_payload(&self, bstream: &mut raklib_std::utils::BinaryStream) {
+            fn encode_payload(&self, bstream: &mut raklib_std::stream::BinaryStream) {
                 #result_quote
             }
         }
@@ -67,7 +67,7 @@ pub fn packet_decode(item: TokenStream) -> TokenStream {
 
     let expanded = quote! {
         impl #impl_generics raklib_std::packet::PacketDecode for #struct_name #ty_generics #where_clause {
-            fn decode(bstream: &mut raklib_std::utils::BinaryStream) -> #struct_name #ty_generics {
+            fn decode(bstream: &mut raklib_std::stream::BinaryStream) -> #struct_name #ty_generics {
                 #result_quote
                 assert_eq!(bstream.p, bstream.data.len());
                 Self { #(#names), * }

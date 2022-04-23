@@ -1,6 +1,6 @@
 use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
 use crate::*;
-use raklib_std::utils::BinaryStream;
+use raklib_std::stream::BinaryStream;
 use std::{
     collections::HashMap,
     net::SocketAddr,

@@ -1,4 +1,4 @@
-use raklib_std::utils::{BSAdapter, BinaryStream};
+use raklib_std::stream::{BSAdapter, BinaryStream};
 use std::ops::{Add, AddAssign};
 
 #[allow(non_camel_case_types)]
@@ -26,7 +26,7 @@ impl BSAdapter for u24 {
         }
     }
 
-    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::utils::Result<()>
+    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::stream::Result<()>
     where
         Self: Sized,
     {

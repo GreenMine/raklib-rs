@@ -6,7 +6,7 @@ use crate::{
     server::Session,
     *,
 };
-use raklib_std::{packet::Packet, utils::BinaryStream};
+use raklib_std::{packet::Packet, stream::BinaryStream};
 
 impl Server {
     pub(crate) fn unconnected_handler(

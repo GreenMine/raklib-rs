@@ -1,6 +1,6 @@
 use crate::protocol::{consts, types::Magic};
 use raklib_std::packet::{Packet, PacketDecode};
-use raklib_std::utils::BinaryStream;
+use raklib_std::stream::BinaryStream;
 
 use std::net::SocketAddr;
 //TODO: Add prelude?
@@ -70,7 +70,11 @@ pub struct SecondOpenConnectionReply {
 
 impl SecondOpenConnectionReply {
     pub fn new(client_address: SocketAddr, mtu_length: u16, encryption: bool) -> Self {
-        Self { client_address, mtu_length, encryption, }
+        Self {
+            client_address,
+            mtu_length,
+            encryption,
+        }
     }
 }
 

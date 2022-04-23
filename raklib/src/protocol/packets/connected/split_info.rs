@@ -1,4 +1,4 @@
-use raklib_std::utils::{BSAdapter, BinaryStream};
+use raklib_std::stream::{BSAdapter, BinaryStream};
 
 #[derive(Copy, Clone, Debug)]
 pub struct SplitInfo {
@@ -19,7 +19,7 @@ impl BSAdapter for SplitInfo {
         }
     }
 
-    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::utils::Result<()>
+    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::stream::Result<()>
     where
         Self: Sized,
     {

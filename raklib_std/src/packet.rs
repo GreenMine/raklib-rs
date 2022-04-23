@@ -1,4 +1,5 @@
-use crate::utils::BinaryStream;
+use crate::stream::BinaryStream;
+use crate::stream::Result;
 
 pub trait Packet {
     const ID: u8;
@@ -18,7 +19,6 @@ pub trait PacketEncode: Packet {
         Self: Sized,
     {
         let mut bstream = BinaryStream::with_len(self.packet_size());
-
         self.encode_with_buf(&mut bstream);
 
         bstream

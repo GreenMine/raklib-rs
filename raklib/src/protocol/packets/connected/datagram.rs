@@ -4,7 +4,7 @@ use super::FramePacket;
 use crate::protocol::types::{u24, Reliability};
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
-    utils::BinaryStream,
+    stream::BinaryStream,
 };
 
 pub struct Datagram {

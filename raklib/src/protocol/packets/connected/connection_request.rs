@@ -44,7 +44,7 @@ impl Packet for ConnectionRequestAccepted {
 }
 
 impl PacketEncode for ConnectionRequestAccepted {
-    fn encode_payload(&self, bstream: &mut raklib_std::utils::BinaryStream) {
+    fn encode_payload(&self, bstream: &mut raklib_std::stream::BinaryStream) {
         bstream.add(self.client_address);
         bstream.add(0u16);
 

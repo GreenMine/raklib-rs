@@ -15,7 +15,7 @@ impl Packet for NewIncomingConnection {
 
 //FIXME: weird packet
 impl PacketDecode for NewIncomingConnection {
-    fn decode(bstream: &mut raklib_std::utils::BinaryStream) -> Self
+    fn decode(bstream: &mut raklib_std::stream::BinaryStream) -> Self
     where
         Self: Sized,
     {

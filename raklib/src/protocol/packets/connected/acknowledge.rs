@@ -5,7 +5,7 @@ use crate::*;
 use crate::protocol::types::u24;
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
-    utils::BinaryStream,
+    stream::BinaryStream,
 };
 
 #[derive(Debug, Clone)]

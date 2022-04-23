@@ -36,7 +36,7 @@ macro_rules! impl_for_base_type {
 impl_for_base_type! { u8, u16, u32, u64, i16, i32, i64, bool }
 
 impl BSAdapter for SocketAddr {
-    fn add(this: Self, bs: &mut crate::utils::BinaryStream) -> Result<()>
+    fn add(this: Self, bs: &mut crate::stream::BinaryStream) -> Result<()>
     where
         Self: Sized,
     {
@@ -53,7 +53,7 @@ impl BSAdapter for SocketAddr {
     }
 
     //FIXME: only IPv4
-    fn read(bs: &mut crate::utils::BinaryStream) -> Self
+    fn read(bs: &mut crate::stream::BinaryStream) -> Self
     where
         Self: Sized,
     {

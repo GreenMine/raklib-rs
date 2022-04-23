@@ -1,5 +1,5 @@
 use crate::protocol::consts::MAGIC;
-use raklib_std::utils::{BSAdapter, BinaryStream};
+use raklib_std::stream::{BSAdapter, BinaryStream};
 use std::fmt::{self, Display, Formatter};
 
 #[derive(Clone, Copy, Debug)]
@@ -15,7 +15,7 @@ impl BSAdapter for Magic {
         unsafe { *(bs.read_slice(16).as_ptr() as *const Magic) }
     }
 
-    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::utils::Result<()>
+    fn add(this: Self, bs: &mut BinaryStream) -> raklib_std::stream::Result<()>
     where
         Self: Sized,
     {

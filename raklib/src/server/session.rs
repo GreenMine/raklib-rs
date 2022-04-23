@@ -4,7 +4,7 @@ use crate::protocol::{
 };
 use crate::*;
 use raklib_std::packet::{Packet, PacketDecode};
-use raklib_std::utils::BinaryStream;
+use raklib_std::stream::BinaryStream;
 use std::{collections::HashMap, net::SocketAddr, rc::Rc, time::Instant};
 
 use super::UdpSocket;
