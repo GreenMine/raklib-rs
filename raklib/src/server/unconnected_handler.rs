@@ -1,6 +1,6 @@
 use std::net::SocketAddr;
 
-use super::Server;
+use super::{Result, Server};
 use crate::{
     protocol::{consts, packets::offline::*},
     server::Session,
@@ -15,10 +15,10 @@ impl Server {
         bstream: &mut BinaryStream,
         addr: SocketAddr,
         read_bytes: usize,
-    ) -> std::io::Result<()> {
+    ) -> Result<()> {
         match packet_id {
             OfflinePingPacket::ID => {
-                let offline_packet = bstream.decode::<OfflinePingPacket>().unwrap();
+                let offline_packet = bstream.decode::<OfflinePingPacket>()?;
 
                 let reply = OfflinePongPacket::new(offline_packet.time, consts::SERVER_TITLE);
 
@@ -26,9 +26,16 @@ impl Server {
             }
             FirstOpenConnectionRequest::ID => {
                 let request = bstream.decode::<FirstOpenConnectionRequest>().unwrap();
-                let reply = FirstOpenConnectionReply::new(false, request.mtu_length);
-
-                self.socket.send(&reply, addr)?;
+                //TODO: protocol acceptor
+                if request.protocol_version != consts::PROTOCOL_VERSION {
+                    self.socket
+                        .send(&IncompatibleProtocolVersion::new(), addr)?;
+                } else {
+                    self.socket.send(
+                        &FirstOpenConnectionReply::new(false, request.mtu_length),
+                        addr,
+                    )?;
+                }
             }
             SecondOpenConnectionRequest::ID => {
                 let request2 = bstream.decode::<SecondOpenConnectionRequest>().unwrap();

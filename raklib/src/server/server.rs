@@ -54,7 +54,7 @@ impl Server {
                             }
                         }
                     } else {
-                        self.unconnected_handler(packet_id, &mut bstream, addr, readed_bytes)?
+                        self.unconnected_handler(packet_id, &mut bstream, addr, readed_bytes);
                     }
 
                     bstream.clear();
