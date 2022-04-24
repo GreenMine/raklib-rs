@@ -5,6 +5,7 @@ authors = ["GreenMine <greenmine94@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+tokio = { version = "1.17.0", features = ["net", "sync", "macros", "rt-multi-thread", "time"] }
 colored = "2.0.0"
 lazy_static = "1.4.0"
 raklib_std = { path = "../raklib_std" }

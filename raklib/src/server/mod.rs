@@ -12,3 +12,4 @@ pub use session::Session;
 pub(crate) use udp_socket::UdpSocket;
 
 pub type Result<T> = std::result::Result<T, HandleError>;
+pub type ConnectedData = (std::net::SocketAddr, tokio::sync::mpsc::Receiver<Vec<u8>>);

@@ -5,24 +5,32 @@ use crate::protocol::{
 use crate::*;
 use raklib_std::packet::{Packet, PacketDecode};
 use raklib_std::stream::BinaryStream;
-use std::{collections::HashMap, net::SocketAddr, rc::Rc, time::Instant};
+use std::sync::Arc;
+use std::{collections::HashMap, net::SocketAddr, time::Instant};
+use tokio::sync::mpsc::Sender;
 
 use super::UdpSocket;
 
 pub struct Session {
     address: SocketAddr,
-    socket: Rc<UdpSocket>,
+    socket: Arc<UdpSocket>,
     datagram: Datagram,
     last_ping_time: Instant,
     ack_packets: Vec<u24>,
     _nack_packets: Vec<u24>,
     split_packets: HashMap<i16, Vec<FramePacket>>,
+    channel: Sender<Vec<u8>>,
 }
 
 impl Session {
-    pub(crate) fn new(address: SocketAddr, socket: Rc<UdpSocket>) -> Session {
+    pub(crate) fn new(
+        address: SocketAddr,
+        channel: Sender<Vec<u8>>,
+        socket: Arc<UdpSocket>,
+    ) -> Session {
         let mut session = Session {
             address,
+            channel,
             socket,
             datagram: Datagram::new(),
             last_ping_time: Instant::now(),
@@ -37,10 +45,13 @@ impl Session {
 }
 
 impl Session {
-    pub fn update(&mut self) {
+    pub async fn update(&mut self) {
         //TODO: че туду, еблан, написал и забыл
         if !self.datagram.packets.is_empty() {
-            self.socket.send(&self.datagram, self.address).unwrap();
+            self.socket
+                .send(&self.datagram, self.address)
+                .await
+                .unwrap();
 
             self.datagram.seq_number.inc();
             self.datagram.packets.clear();
@@ -48,7 +59,7 @@ impl Session {
 
         if !self.ack_packets.is_empty() {
             let ack = Ack::from_packets(&mut self.ack_packets);
-            self.socket.send(&ack, self.address).unwrap();
+            self.socket.send(&ack, self.address).await.unwrap();
 
             self.ack_packets.clear();
         }
@@ -66,15 +77,14 @@ impl Session {
         unimplemented!("handler for NACK packets!");
     }
 
-    pub fn handle_datagram(&mut self, packet: Datagram) {
+    pub async fn handle_datagram(&mut self, packet: Datagram) {
         self.ack_packets.push(packet.seq_number);
-        packet
-            .packets
-            .into_iter()
-            .for_each(|p| self.handle_framepacket(p));
+        for p in packet.packets {
+            self.handle_framepacket(p).await;
+        }
     }
 
-    pub fn handle_framepacket(&mut self, mut packet: FramePacket) {
+    pub async fn handle_framepacket(&mut self, mut packet: FramePacket) {
         if let Some(_) = packet.split_info {
             if let Some(split_result) = self.handle_split(packet) {
                 packet = split_result;
@@ -105,7 +115,7 @@ impl Session {
                 let _packet = bs.decode::<NewIncomingConnection>();
             }
             0xFE => {
-                unimplemented!("game packet process");
+                self.channel.send(bs.data).await.unwrap();
             }
             _ => unimplemented!("connected 0x{:02X} packet!", packet_id),
         }

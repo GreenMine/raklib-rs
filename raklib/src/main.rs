@@ -8,11 +8,23 @@ pub use utils::log;
 
 use server::Server;
 
-fn main() -> std::io::Result<()> {
-    let address = "127.0.0.1:19135".parse().unwrap();
+#[tokio::main]
+async fn main() {
+    let address = "192.168.1.67:19135".parse().unwrap();
 
-    let mut server = Server::new(address)?;
-    server.run()?;
+    let mut server = Server::bind(address).await.unwrap();
+    server.run().await.unwrap();
 
-    Ok(())
+    loop {
+        if let Some((user, mut stream)) = server.recv().await {
+            println!("new user connected: {}", user);
+            tokio::spawn(async move {
+                loop {
+                    if let Some(data) = stream.recv().await {
+                        println!("Connected data got(len: {})!", data.len());
+                    }
+                }
+            });
+        }
+    }
 }

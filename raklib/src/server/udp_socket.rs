@@ -1,8 +1,7 @@
 use crate::*;
-use std::{
-    net::{SocketAddr, ToSocketAddrs, UdpSocket as RawUdpSocket},
-    ops::Deref,
-};
+use std::{net::SocketAddr, ops::Deref};
+
+use tokio::net::{ToSocketAddrs, UdpSocket as RawUdpSocket};
 
 use raklib_std::packet::PacketEncode;
 
@@ -12,11 +11,8 @@ pub(crate) struct UdpSocket {
 }
 
 impl UdpSocket {
-    pub(crate) fn bind(address: SocketAddr) -> std::io::Result<Self> {
-        let socket = RawUdpSocket::bind(address)?;
-        socket
-            .set_nonblocking(true)
-            .expect("Error to set UDP socket to non-blocking mode");
+    pub(crate) async fn bind(address: SocketAddr) -> std::io::Result<Self> {
+        let socket = RawUdpSocket::bind(address).await?;
 
         Ok(Self { address, socket })
     }
@@ -25,7 +21,7 @@ impl UdpSocket {
         &self.address
     }
 
-    pub(crate) fn send<T: PacketEncode, A: ToSocketAddrs>(
+    pub(crate) async fn send<T: PacketEncode, A: ToSocketAddrs>(
         &self,
         packet: &T,
         addr: A,
@@ -41,7 +37,7 @@ impl UdpSocket {
             debug!("Send {} packet!", packet_name);
         }
 
-        self.socket.send_to(packet.encode().get_raw(), addr)
+        self.socket.send_to(packet.encode().get_raw(), addr).await
     }
 }
 

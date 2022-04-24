@@ -1,78 +1,107 @@
 use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
 use crate::*;
 use raklib_std::stream::BinaryStream;
+use std::sync::Arc;
 use std::{
     collections::HashMap,
     net::SocketAddr,
-    rc::Rc,
-    thread,
     time::{Duration, Instant},
 };
 
-use super::{Session, Sessions, UdpSocket};
+use super::{Sessions, UdpSocket};
+
+use crate::server::ConnectedData;
+use tokio::sync::{mpsc, Mutex};
 
 pub struct Server {
-    pub(super) socket: Rc<UdpSocket>, // FIXME: fuck RefCounter
+    pub(super) socket: Arc<UdpSocket>, // FIXME: fuck RefCounter
     pub(super) _start_time: Instant,
-    pub(super) sessions: Sessions,
+    pub(super) sessions: Arc<Mutex<Sessions>>,
+    pub(super) mpsc: (mpsc::Sender<ConnectedData>, mpsc::Receiver<ConnectedData>),
 }
 
+unsafe impl Send for Server {}
+
 impl Server {
-    pub fn new(address: SocketAddr) -> std::io::Result<Self> {
+    pub async fn bind(address: SocketAddr) -> std::io::Result<Self> {
         Ok(Self {
-            socket: Rc::new(UdpSocket::bind(address)?),
+            socket: Arc::new(UdpSocket::bind(address).await?),
             _start_time: Instant::now(),
-            sessions: HashMap::new(),
+            sessions: Arc::new(Mutex::new(HashMap::new())),
+            mpsc: mpsc::channel(100), //FIXME:
         })
     }
 
-    pub fn run(&mut self) -> std::io::Result<()> {
-        let mut bstream = BinaryStream::with_len(2048);
+    pub async fn recv(&mut self) -> Option<ConnectedData> {
+        self.mpsc.1.recv().await
+    }
 
+    pub async fn run(&mut self) -> std::io::Result<()> {
         log!(
             "RakNet connection opened on {}",
             self.socket.get_bind_address()
         );
 
-        loop {
-            let tick_start = Instant::now();
+        let socket = Arc::clone(&self.socket);
+        let sessions = Arc::clone(&self.sessions);
+        let sender = self.mpsc.0.clone();
 
-            //Test architecture, like in PHP RakLib
-            for _ in 0..100 {
-                if let Ok((readed_bytes, addr)) = self.socket.recv_from(bstream.get_raw_mut()) {
-                    bstream.data.truncate(readed_bytes); //FIXME: truncate free truncated elements memory block
-                    let packet_id = bstream.read::<u8>().unwrap();
+        tokio::spawn(async move {
+            let mut bstream = BinaryStream::with_len(2048);
+            loop {
+                let tick_start = Instant::now();
 
-                    if packet_id & Datagram::BITFLAG_VALID != 0 {
-                        if let Some(session) = self.sessions.get_mut(&addr) {
-                            if packet_id & Datagram::BITFLAG_ACK != 0 {
-                                session.handle_ack(bstream.decode().unwrap());
-                            } else if packet_id & Datagram::BITFLAG_NAK != 0 {
-                                unimplemented!("not acknowledge packet!");
-                            } else {
-                                session.handle_datagram(bstream.decode().unwrap());
+                for _ in 0..100 {
+                    if let Ok((read_bytes, addr)) = socket.try_recv_from(bstream.get_raw_mut()) {
+                        bstream.data.truncate(read_bytes); //FIXME: truncate free truncated elements memory block
+                        let packet_id = bstream.read::<u8>().unwrap();
+
+                        if packet_id & Datagram::BITFLAG_VALID != 0 {
+                            if let Some(session) = sessions.lock().await.get_mut(&addr) {
+                                if packet_id & Datagram::BITFLAG_ACK != 0 {
+                                    session.handle_ack(bstream.decode().unwrap());
+                                } else if packet_id & Datagram::BITFLAG_NAK != 0 {
+                                    unimplemented!("not acknowledge packet!");
+                                } else {
+                                    session.handle_datagram(bstream.decode().unwrap()).await;
+                                }
                             }
+                        } else {
+                            Server::unconnected_handler(
+                                &socket,
+                                &sender,
+                                &sessions,
+                                packet_id,
+                                &mut bstream,
+                                addr,
+                                read_bytes,
+                            )
+                            .await
+                            .unwrap();
                         }
-                    } else {
-                        self.unconnected_handler(packet_id, &mut bstream, addr, readed_bytes);
-                    }
 
-                    bstream.clear();
+                        bstream.clear();
+                    }
+                }
+
+                for session in sessions.lock().await.values_mut() {
+                    session.update().await;
+                } //Update all sessions
+
+                let tick_lead_ms = tick_start.elapsed().as_millis();
+                if tick_lead_ms < TIME_PER_TICK {
+                    tokio::time::sleep(Duration::from_millis(
+                        (TIME_PER_TICK - tick_lead_ms) as u64,
+                    ))
+                    .await;
                 }
             }
+        });
 
-            //TODO: stream for loop?
-
-            self.sessions.values_mut().for_each(Session::update); //updates all sessions
-
-            let tick_lead_ms = tick_start.elapsed().as_millis();
-            if tick_lead_ms < TIME_PER_TICK {
-                thread::sleep(Duration::from_millis((TIME_PER_TICK - tick_lead_ms) as u64));
-            }
-        }
+        Ok(())
     }
 
-    pub(crate) fn as_human_read_bin(bin: &[u8]) -> String {
+    pub(crate) fn bin_to_hex_table(bin: &[u8]) -> String {
         let mut str = String::new();
         bin.iter().enumerate().for_each(|(i, &b)| {
             str += &format!("0x{:02X} ", b);
