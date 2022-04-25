@@ -51,6 +51,7 @@ impl Server {
             loop {
                 let tick_start = Instant::now();
 
+                //TODO: maybe need to rewrite it(now pasted from pmmp raklib implementation)
                 for _ in 0..100 {
                     if let Ok((read_bytes, addr)) = socket.try_recv_from(bstream.get_raw_mut()) {
                         bstream.data.truncate(read_bytes); //FIXME: truncate free truncated elements memory block

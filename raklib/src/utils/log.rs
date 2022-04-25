@@ -1,6 +1,7 @@
 use colored::Colorize;
 use lazy_static::lazy_static;
 
+const PKG_NAME: &str = env!("CARGO_PKG_NAME");
 lazy_static! {
     pub static ref DEFAULT_LOGGER: StdoutLogger = {
         let level = std::env::var("LOG_LEVEL")
@@ -56,7 +57,7 @@ impl StdoutLogger {
             return;
         }
 
-        let header = &format!("[{:?}]", level).to_ascii_lowercase()[..];
+        let header = &format!("[{}] [{:?}]", PKG_NAME, level).to_ascii_lowercase()[..];
         let colored_header = match level {
             Level::Debug => header.blue(),
             Level::Info => header.green(),

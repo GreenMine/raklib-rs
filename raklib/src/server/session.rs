@@ -115,7 +115,7 @@ impl Session {
                 let _packet = bs.decode::<NewIncomingConnection>();
             }
             0xFE => {
-                self.channel.send(bs.data).await.unwrap();
+                self.channel.send(bs.data[1..].to_vec()).await.unwrap(); //FIXME: to_vec
             }
             _ => unimplemented!("connected 0x{:02X} packet!", packet_id),
         }
