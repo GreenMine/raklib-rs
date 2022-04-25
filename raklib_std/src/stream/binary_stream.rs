@@ -3,8 +3,8 @@ use crate::packet::PacketDecode;
 use super::{Adapter, EndOfStream, Result};
 
 pub struct BinaryStream {
-    pub data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
-    pub p: usize,      //FIXME: delete PUB
+    pub(crate) data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
+    pub p: usize,             //FIXME: delete PUB
 }
 
 //TODO: Always converting from big-endian to little-endian and vice versa for reading and sending
@@ -84,11 +84,15 @@ impl BinaryStream {
         self.p
     }
 
+    pub fn get_data(self) -> Vec<u8> {
+        self.data
+    }
+
     pub fn get_raw(&self) -> &[u8] {
         &self.data[..]
     }
 
-    pub fn get_raw_mut(&mut self) -> &mut [u8] {
-        &mut self.data[..]
+    pub fn get_raw_mut(&mut self) -> &mut Vec<u8> {
+        &mut self.data
     }
 }

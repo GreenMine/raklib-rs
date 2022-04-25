@@ -19,7 +19,7 @@ impl PacketDecode for FirstOpenConnectionRequest {
         Ok(Self {
             magic: bstream.read()?,
             protocol_version: bstream.read()?,
-            mtu_length: bstream.data.len() as u16,
+            mtu_length: bstream.get_raw().len() as u16, //TODO: get stream length
         })
     }
 }

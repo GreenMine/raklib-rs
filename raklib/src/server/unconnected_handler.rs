@@ -64,7 +64,7 @@ impl Server {
                 error!(
                     "Unimplemented packet: 0x{:02X}\nRead data:\n{}",
                     packet_id,
-                    Self::bin_to_hex_table(&bstream.data[..read_bytes])
+                    Self::bin_to_hex_table(&bstream.get_raw()[..read_bytes])
                 );
             }
         }

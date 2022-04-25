@@ -15,7 +15,7 @@ pub struct FramePacket {
 
 impl FramePacket {
     pub fn from_packet<T: PacketEncode>(data: T, reliability: Reliability) -> Self {
-        Self::from_raw(data.encode().data, reliability)
+        Self::from_raw(data.encode().get_data(), reliability)
     }
 
     pub fn from_raw(data: Vec<u8>, reliability: Reliability) -> Self {
