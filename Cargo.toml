@@ -3,9 +3,9 @@ members = [
 	"raklib",
 	"raklib_std",
 	"raklib_derive",
+	"raklib_examples"
 ]
 
 [profile.release]
 lto = "thin"
 codegen-units = 4
-panic = "abort"
