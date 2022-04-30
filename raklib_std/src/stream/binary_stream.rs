@@ -2,6 +2,7 @@ use crate::packet::PacketDecode;
 
 use super::{Adapter, EndOfStream, Result};
 
+#[derive(Debug)]
 pub struct BinaryStream {
     pub(crate) data: Vec<u8>, //TODO: Rewrite it to Box<[u8]>(for more information: https://users.rust-lang.org/t/why-does-putting-an-array-in-a-box-cause-stack-overflow/36493/7)
     pub p: usize,             //FIXME: delete PUB
@@ -88,6 +89,7 @@ impl BinaryStream {
         self.data
     }
 
+    //TODO: maybe, random access is not logical for stream
     pub fn get_raw(&self) -> &[u8] {
         &self.data[..]
     }

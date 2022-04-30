@@ -85,9 +85,12 @@ impl Server {
                     }
                 }
 
+                Self::update_sessions(Arc::clone(&sessions)).await;
                 for session in sessions.lock().await.values_mut() {
                     session.update().await;
-                } //Update all sessions
+
+                    if !session.status.is_connected() {}
+                }
 
                 let tick_lead_ms = tick_start.elapsed().as_millis();
                 if tick_lead_ms < TIME_PER_TICK {
@@ -100,6 +103,23 @@ impl Server {
         });
 
         Ok(())
+    }
+
+    pub(crate) async fn update_sessions(sessions: Arc<Mutex<Sessions>>) {
+        let mut sessions = sessions.lock().await;
+        let mut need_to_remove = Vec::new();
+
+        for session in sessions.values_mut() {
+            session.update().await;
+
+            if !session.status.is_connected() {
+                need_to_remove.push(session.get_addr());
+            }
+        }
+
+        need_to_remove.iter().for_each(|a| {
+            sessions.remove(a);
+        });
     }
 
     pub(crate) fn bin_to_hex_table(bin: &[u8]) -> String {

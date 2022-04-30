@@ -7,7 +7,7 @@ use super::{Result, Server};
 use crate::server::{ConnectedData, Sessions, UdpSocket};
 use crate::{
     protocol::{consts, packets::offline::*},
-    server::Session,
+    server::session::Session,
     *,
 };
 use raklib_std::{packet::Packet, stream::BinaryStream};

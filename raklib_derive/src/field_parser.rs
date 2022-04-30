@@ -46,7 +46,7 @@ pub fn get_fields_with_attribute(current_struct: DeriveInput) -> Vec<StructField
 
 pub fn get_fields(current_struct: DeriveInput) -> impl Iterator<Item = syn::Field> {
     let raw_fields = extract!(current_struct.data, Data::Struct(s) => s.fields, "only structs!");
-    let fields = extract!(raw_fields, Fields::Named(f) => f.named, "only named fields!");
+    let fields = extract!(raw_fields, Fields::Named(f) => f.named, "only named fields!"); //FIXME: unit structs
 
     fields.into_iter()
 }
