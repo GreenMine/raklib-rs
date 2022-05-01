@@ -15,18 +15,7 @@ async fn main() {
                     if let Some(stream) = listener.recv().await {
                         println!("new data");
 
-                        let data = stream.get_data();
-                        let mut decompress = Decompress::new(false);
-                        let mut decompressed = Vec::with_capacity(65536);
-                        decompress
-                            .decompress_vec(&data, &mut decompressed, FlushDecompress::Finish)
-                            .unwrap();
-
-                        std::fs::write(
-                            "log/decompressed.bin",
-                            &decompressed[..decompress.total_out() as usize],
-                        )
-                        .unwrap();
+                        unimplemented!()
                     }
                 }
             });
