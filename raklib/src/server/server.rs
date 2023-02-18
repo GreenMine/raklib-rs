@@ -1,5 +1,4 @@
 use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
-use crate::*;
 use raklib_std::stream::BinaryStream;
 use std::sync::Arc;
 use std::{
@@ -37,8 +36,8 @@ impl Server {
     }
 
     pub async fn run(&mut self) -> std::io::Result<()> {
-        log!(
-            "RakNet connection opened on {}",
+        log::info!(
+            "RakNet connection opened on {:?}",
             self.socket.get_bind_address()
         );
 

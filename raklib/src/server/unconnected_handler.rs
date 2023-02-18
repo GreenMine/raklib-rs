@@ -8,7 +8,6 @@ use crate::server::{ConnectedData, Sessions, UdpSocket};
 use crate::{
     protocol::{consts, packets::offline::*},
     server::session::Session,
-    *,
 };
 use raklib_std::{packet::Packet, stream::BinaryStream};
 
@@ -51,7 +50,7 @@ impl Server {
                 let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
                 socket.send(&reply2, addr).await?;
-                log!("Create new session for {}!", addr);
+                log::info!("Create new session for {}!", addr);
 
                 let (connected_tx, connected_rx) = mpsc::channel(2048);
                 let session = Session::new(addr, connected_tx, socket.clone());
@@ -61,7 +60,7 @@ impl Server {
                 sender.send((addr, connected_rx)).await.unwrap();
             }
             _ => {
-                error!(
+                log::error!(
                     "Unimplemented packet: 0x{:02X}\nRead data:\n{}",
                     packet_id,
                     Self::bin_to_hex_table(&bstream.get_raw()[..read_bytes])

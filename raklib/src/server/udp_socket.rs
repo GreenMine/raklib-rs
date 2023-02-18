@@ -1,4 +1,3 @@
-use crate::*;
 use std::{net::SocketAddr, ops::Deref};
 
 use tokio::net::{ToSocketAddrs, UdpSocket as RawUdpSocket};
@@ -34,7 +33,7 @@ impl UdpSocket {
                 .last()
                 .unwrap_or(full_packet_name);
 
-            debug!("Send {} packet!", packet_name);
+            log::debug!("Send {} packet!", packet_name);
         }
 
         self.socket.send_to(packet.encode().get_raw(), addr).await

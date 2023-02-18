@@ -1,7 +1,5 @@
 use std::ops::RangeInclusive;
 
-use crate::*;
-
 use crate::protocol::types::u24;
 use raklib_std::{
     packet::{Packet, PacketDecode, PacketEncode},
@@ -53,7 +51,7 @@ impl Ack {
         });
         f(start, end);
 
-        debug!("ACK records: {:?}", records);
+        log::debug!("ACK records: {:?}", records);
 
         Self { records }
     }

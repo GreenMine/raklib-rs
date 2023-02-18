@@ -9,7 +9,6 @@ use raklib_std::packet::{Packet, PacketDecode};
 use raklib_std::stream::BinaryStream;
 use std::sync::Arc;
 use std::{collections::HashMap, net::SocketAddr, time::Instant};
-use tokio::runtime::{Handle, Runtime};
 use tokio::sync::mpsc::Sender;
 
 use super::UdpSocket;
@@ -75,7 +74,7 @@ impl Session {
     }
 
     pub fn handle_ack(&mut self, ack_packet: Ack) {
-        crate::debug!("Received ACK packet: {:?}", ack_packet);
+        log::debug!("Received ACK packet: {:?}", ack_packet);
     }
 
     pub fn handle_nack<T: PacketDecode>(&mut self, _nack: T) {

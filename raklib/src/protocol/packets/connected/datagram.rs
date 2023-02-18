@@ -1,5 +1,3 @@
-use std::ops::{Deref, DerefMut};
-
 use super::FramePacket;
 use crate::protocol::types::{u24, Reliability};
 use raklib_std::{
