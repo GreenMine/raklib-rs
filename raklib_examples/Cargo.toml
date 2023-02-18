@@ -11,3 +11,4 @@ raklib_std = { path = "../raklib_std" }
 tokio = { version = "1.17.0", features = ["net", "sync", "macros", "rt-multi-thread"] }
 flate2 = { version = "1.0.17", features = ["zlib"], default-features = false }
 
+env_logger = "0.9.3"

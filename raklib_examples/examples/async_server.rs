@@ -4,6 +4,8 @@ use raklib_std::packet::Packet;
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
     let address = "127.0.0.1:19135".parse().unwrap();
     let mut server = Server::bind(address).await.unwrap();
     server.run().await.unwrap();

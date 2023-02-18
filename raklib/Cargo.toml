@@ -15,4 +15,3 @@ raklib_std = { path = "../raklib_std" }
 raklib_derive = { path = "../raklib_derive" }
 
 log = "0.4.0"
-env_logger = "0.9.3"
