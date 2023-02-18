@@ -8,17 +8,13 @@ async fn main() {
     let mut server = Server::bind(address).await.unwrap();
     server.run().await.unwrap();
 
-    loop {
+    'main: loop {
         if let Some((user, mut listener)) = server.recv().await {
-            tokio::spawn(async move {
-                loop {
-                    if let Some(stream) = listener.recv().await {
-                        println!("new data");
-
-                        unimplemented!()
-                    }
+            loop {
+                if let Some(stream) = listener.recv().await {
+                    println!("new data");
                 }
-            });
+            }
         }
     }
 }

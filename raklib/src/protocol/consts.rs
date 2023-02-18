@@ -14,4 +14,4 @@ pub const TIME_PER_TICK: u128 = (1000.0 / (TICKS as f32)) as u128;
 
 pub const SERVER_TITLE: &str =
     "MCPE;Rust core test!;422;1.16.200;0;2000;2570685482448425430;RakLibRS;Survival;";
-pub const PROTOCOL_VERSION: u8 = 10;
+pub const PROTOCOL_VERSION: u8 = 11;

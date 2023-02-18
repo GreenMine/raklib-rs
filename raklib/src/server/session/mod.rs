@@ -11,7 +11,6 @@ use std::sync::Arc;
 use std::{collections::HashMap, net::SocketAddr, time::Instant};
 use tokio::runtime::{Handle, Runtime};
 use tokio::sync::mpsc::Sender;
-use tokio::task::spawn_blocking;
 
 use super::UdpSocket;
 
@@ -182,19 +181,5 @@ impl Session {
             .push(ConnectedPing::new(0), Reliability::Unreliable);
 
         self.last_ping_time = Instant::now();
-    }
-}
-
-impl Drop for Session {
-    fn drop(&mut self) {
-        if self.status.is_connected() {
-            crate::log!("drop {}", self.address);
-            self.disconnect();
-
-            let handle = Handle::current();
-            handle.block_on(async {
-                self.update().await;
-            });
-        }
     }
 }

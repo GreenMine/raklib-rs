@@ -8,6 +8,7 @@ repository = "https://github.com/GreenMine/raklib-rs"
 
 [dependencies]
 tokio = { version = "1.17.0", features = ["net", "sync", "macros", "rt-multi-thread", "time"] }
+futures = "0.3"
 colored = "2.0.0"
 lazy_static = "1.4.0"
 raklib_std = { path = "../raklib_std" }
