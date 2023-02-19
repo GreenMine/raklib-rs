@@ -1,16 +1,18 @@
-use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
-use raklib_std::stream::BinaryStream;
-use std::sync::Arc;
 use std::{
     collections::HashMap,
     net::SocketAddr,
     time::{Duration, Instant},
 };
+use std::sync::Arc;
+
+use tokio::sync::{mpsc, Mutex};
+
+use raklib_std::stream::BinaryStream;
+
+use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
+use crate::server::ConnectedData;
 
 use super::{Sessions, UdpSocket};
-
-use crate::server::ConnectedData;
-use tokio::sync::{mpsc, Mutex};
 
 pub struct Server {
     pub(super) socket: Arc<UdpSocket>, // FIXME: fuck RefCounter

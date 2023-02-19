@@ -1,8 +1,11 @@
-use crate::protocol::{consts, types::Magic};
+use std::net::SocketAddr;
+
 use raklib_std::packet::{Packet, PacketDecode};
+use raklib_std::protocol::types::{self, Magic};
 use raklib_std::stream::{BinaryStream, Result};
 
-use std::net::SocketAddr;
+use crate::protocol::consts;
+
 //TODO: Add prelude?
 
 pub struct FirstOpenConnectionRequest {
@@ -26,7 +29,7 @@ impl PacketDecode for FirstOpenConnectionRequest {
 
 #[derive(raklib_derive::PacketEncode)]
 pub struct FirstOpenConnectionReply {
-    #[const_fields(consts::MAGIC, consts::SERVER_GUID)]
+    #[const_fields(types::MAGIC, consts::SERVER_GUID)]
     pub use_security: bool,
     pub mtu_length: u16,
 }
@@ -62,7 +65,7 @@ impl Packet for SecondOpenConnectionRequest {
 
 #[derive(raklib_derive::PacketEncode)]
 pub struct SecondOpenConnectionReply {
-    #[const_fields(consts::MAGIC, consts::SERVER_GUID)]
+    #[const_fields(types::MAGIC, consts::SERVER_GUID)]
     pub client_address: SocketAddr,
     pub mtu_length: u16,
     pub encryption: bool,

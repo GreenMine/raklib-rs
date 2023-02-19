@@ -1,5 +1,6 @@
-use raklib_std::stream::{Adapter, BinaryStream, Result};
 use std::ops::{Add, AddAssign};
+
+use crate::stream::{Adapter, BinaryStream, Result};
 
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy)]

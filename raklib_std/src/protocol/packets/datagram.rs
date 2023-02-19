@@ -1,6 +1,6 @@
 use super::FramePacket;
 use crate::protocol::types::{u24, Reliability};
-use raklib_std::{
+use crate::{
     packet::{Packet, PacketDecode, PacketEncode},
     stream::{BinaryStream, Result},
 };

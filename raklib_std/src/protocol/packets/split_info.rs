@@ -1,4 +1,4 @@
-use raklib_std::stream::{Adapter, BinaryStream, Result};
+use crate::stream::{Adapter, BinaryStream, Result};
 
 #[derive(Copy, Clone, Debug)]
 pub struct SplitInfo {

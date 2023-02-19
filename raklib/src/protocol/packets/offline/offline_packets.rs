@@ -1,8 +1,7 @@
-use crate::protocol::{
-    consts,
-    types::{Magic, RakNetString},
-};
 use raklib_std::packet::Packet;
+use raklib_std::protocol::types::{self, Magic, RakNetString};
+
+use crate::protocol::consts;
 
 #[derive(raklib_derive::PacketDecode)]
 pub struct OfflinePingPacket {
@@ -18,7 +17,7 @@ impl Packet for OfflinePingPacket {
 #[derive(raklib_derive::PacketEncode)]
 pub struct OfflinePongPacket<'a> {
     pub time: u64,
-    #[const_fields(consts::SERVER_GUID, consts::MAGIC)]
+    #[const_fields(consts::SERVER_GUID, types::MAGIC)]
     pub server_id_string: RakNetString<'a>,
 }
 

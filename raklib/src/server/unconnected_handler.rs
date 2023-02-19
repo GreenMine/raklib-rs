@@ -1,15 +1,18 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
-use tokio::sync::mpsc::Sender;
-use tokio::sync::{mpsc, Mutex};
 
-use super::{Result, Server};
-use crate::server::{ConnectedData, Sessions, UdpSocket};
+use tokio::sync::{mpsc, Mutex};
+use tokio::sync::mpsc::Sender;
+
+use raklib_std::{packet::Packet, stream::BinaryStream};
+
 use crate::{
     protocol::{consts, packets::offline::*},
     server::session::Session,
 };
-use raklib_std::{packet::Packet, stream::BinaryStream};
+use crate::server::{ConnectedData, Sessions, UdpSocket};
+
+use super::{Result, Server};
 
 impl Server {
     pub(crate) async fn unconnected_handler(

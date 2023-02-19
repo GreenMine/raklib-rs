@@ -1,6 +1,6 @@
 use std::ops::{Index, Range};
 
-use raklib_std::stream::{Adapter, BinaryStream, Result};
+use crate::stream::{Adapter, BinaryStream, Result};
 
 #[derive(Clone, Copy)]
 pub struct RakNetString<'a> {

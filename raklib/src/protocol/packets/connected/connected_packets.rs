@@ -1,6 +1,5 @@
-use raklib_std::packet::Packet;
-
 use raklib_derive::{PacketDecode, PacketEncode};
+use raklib_std::packet::Packet;
 
 #[derive(PacketEncode, PacketDecode)]
 pub struct ConnectedPing {

@@ -1,8 +1,8 @@
 use crate::protocol::{
-    packets::connected::split_info::SplitInfo,
+    packets::split_info::SplitInfo,
     types::{u24, Reliability},
 };
-use raklib_std::{
+use crate::{
     packet::{Packet, PacketDecode, PacketEncode},
     stream::{BinaryStream, Result},
 };

@@ -1,5 +1,6 @@
-use raklib_std::stream::EndOfStream;
 use std::io::Error;
+
+use raklib_std::stream::EndOfStream;
 
 #[derive(Debug)]
 pub enum HandleError {
