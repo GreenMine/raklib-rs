@@ -27,9 +27,9 @@ impl BinaryStream {
         Adapter::add(data, self)
     }
 
-    //В проверке на переполение нет необходимости,
-    //т.к. если я записываю что-то лишнее, это пробема сервера, а не клиента.
-    //Следовательно, паника будет адекватным решением
+    /// There is no need to check for overflow,
+    /// because if I record something superfluous, it's the server's problem, not the client's.
+    /// Therefore, panic will be an adequate solution
     pub fn add_slice(&mut self, slice: &[u8]) {
         self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
         self.p += slice.len();
