@@ -1,10 +1,10 @@
-use crate::protocol::{
-    packets::split_info::SplitInfo,
-    types::{u24, Reliability},
-};
 use crate::{
     packet::{Packet, PacketDecode, PacketEncode},
     stream::{BinaryStream, Result},
+};
+use crate::protocol::{
+    packets::split_info::SplitInfo,
+    types::{Reliability, u24},
 };
 
 pub struct FramePacket {

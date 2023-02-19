@@ -1,4 +1,5 @@
 use flate2::{Decompress, FlushDecompress};
+
 use raklib::Server;
 use raklib_std::packet::Packet;
 

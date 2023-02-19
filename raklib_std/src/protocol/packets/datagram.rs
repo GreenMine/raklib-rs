@@ -1,9 +1,10 @@
-use super::FramePacket;
-use crate::protocol::types::{u24, Reliability};
 use crate::{
     packet::{Packet, PacketDecode, PacketEncode},
     stream::{BinaryStream, Result},
 };
+use crate::protocol::types::{Reliability, u24};
+
+use super::FramePacket;
 
 pub struct Datagram {
     pub seq_number: u24,

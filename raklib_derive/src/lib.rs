@@ -1,12 +1,13 @@
 use proc_macro::TokenStream;
+
 use quote::quote;
 use syn::DeriveInput;
+
+use field_parser::StructField;
 
 #[macro_use]
 mod utils;
 mod field_parser;
-
-use field_parser::StructField;
 
 #[proc_macro_derive(PacketEncode, attributes(const_fields))]
 pub fn packet_encode(item: TokenStream) -> TokenStream {
