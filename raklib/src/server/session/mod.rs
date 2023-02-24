@@ -1,11 +1,11 @@
-use std::{collections::HashMap, net::SocketAddr, time::Instant};
 use std::sync::Arc;
+use std::{collections::HashMap, net::SocketAddr, time::Instant};
 
 use tokio::sync::mpsc::Sender;
 
 use raklib_std::packet::{Packet, PacketDecode};
 use raklib_std::protocol::packets::{Ack, Datagram, FramePacket};
-use raklib_std::protocol::types::{Reliability, u24};
+use raklib_std::protocol::types::{u24, Reliability};
 use raklib_std::stream::BinaryStream;
 pub use status::Status;
 
@@ -153,7 +153,8 @@ impl Session {
                     .cmp(&b.split_info.unwrap().fragment_index)
             });
 
-            let mut buf: Vec<u8> = Vec::new(); //TODO: with_capacity?
+            let mut buf: Vec<u8> = Vec::with_capacity(list.iter().map(|p| p.buffer.len()).sum()); //TODO: with_capacity?
+
             list.iter().for_each(|p| buf.extend_from_slice(&p.buffer));
 
             self.split_packets.remove(&split_id); //remove split packet from hashmap
