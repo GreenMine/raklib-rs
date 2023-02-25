@@ -27,7 +27,7 @@ impl PacketDecode for FirstOpenConnectionRequest {
     }
 }
 
-#[derive(raklib_derive::PacketEncode)]
+#[derive(raklib_std::derive::PacketEncode)]
 pub struct FirstOpenConnectionReply {
     #[const_fields(types::MAGIC, consts::SERVER_GUID)]
     pub use_security: bool,
@@ -51,7 +51,7 @@ impl Packet for FirstOpenConnectionReply {
     }
 }
 
-#[derive(Debug, raklib_derive::PacketDecode)]
+#[derive(Debug, raklib_std::derive::PacketDecode)]
 pub struct SecondOpenConnectionRequest {
     pub magic: Magic,
     pub server_address: SocketAddr,
@@ -63,7 +63,7 @@ impl Packet for SecondOpenConnectionRequest {
     const ID: u8 = 0x07;
 }
 
-#[derive(raklib_derive::PacketEncode)]
+#[derive(raklib_std::derive::PacketEncode)]
 pub struct SecondOpenConnectionReply {
     #[const_fields(types::MAGIC, consts::SERVER_GUID)]
     pub client_address: SocketAddr,

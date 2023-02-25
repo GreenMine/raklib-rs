@@ -5,4 +5,3 @@ pub use open_connection_packets::*;
 mod incompatible_protocol_version;
 mod offline_packets;
 mod open_connection_packets;
-

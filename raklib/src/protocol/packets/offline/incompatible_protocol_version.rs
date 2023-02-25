@@ -1,4 +1,4 @@
-use raklib_derive::PacketEncode;
+use raklib_std::derive::PacketEncode;
 use raklib_std::packet::Packet;
 
 #[derive(PacketEncode)]

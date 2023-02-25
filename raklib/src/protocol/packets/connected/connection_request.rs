@@ -5,7 +5,7 @@ use std::{
 
 use raklib_std::packet::{Packet, PacketEncode};
 
-#[derive(raklib_derive::PacketDecode, Debug)]
+#[derive(raklib_std::derive::PacketDecode, Debug)]
 pub struct ConnectionRequest {
     pub guid: u64,
     pub time: i64,

@@ -12,5 +12,4 @@ futures = "0.3"
 
 log = "0.4.0"
 
-raklib_std = { path = "../raklib_std" }
-raklib_derive = { path = "../raklib_derive" }
+raklib_std = { path = "../raklib_std", features = ["derive"] }

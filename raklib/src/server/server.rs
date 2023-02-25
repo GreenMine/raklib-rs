@@ -1,9 +1,9 @@
+use std::sync::Arc;
 use std::{
     collections::HashMap,
     net::SocketAddr,
     time::{Duration, Instant},
 };
-use std::sync::Arc;
 
 use tokio::sync::{mpsc, Mutex};
 

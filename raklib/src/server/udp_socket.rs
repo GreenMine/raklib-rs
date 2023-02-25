@@ -25,7 +25,7 @@ impl UdpSocket {
         packet: &T,
         addr: A,
     ) -> std::io::Result<usize> {
-        if log::log_enabled!(log::Level::Debug) {
+        if log::log_enabled!(log::Level::Trace) {
             let full_packet_name = std::any::type_name_of_val(packet);
             let packet_name = full_packet_name
                 .split("::")

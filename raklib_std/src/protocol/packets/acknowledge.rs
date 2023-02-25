@@ -1,10 +1,10 @@
 use std::ops::RangeInclusive;
 
+use crate::protocol::types::u24;
 use crate::{
     packet::{Packet, PacketDecode, PacketEncode},
     stream::{BinaryStream, Result},
 };
-use crate::protocol::types::u24;
 
 #[derive(Debug, Clone)]
 pub enum Record {

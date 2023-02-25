@@ -1,16 +1,16 @@
 use std::net::SocketAddr;
 use std::sync::Arc;
 
-use tokio::sync::{mpsc, Mutex};
 use tokio::sync::mpsc::Sender;
+use tokio::sync::{mpsc, Mutex};
 
 use raklib_std::{packet::Packet, stream::BinaryStream};
 
+use crate::server::{ConnectedData, Sessions, UdpSocket};
 use crate::{
     protocol::{consts, packets::offline::*},
     server::session::Session,
 };
-use crate::server::{ConnectedData, Sessions, UdpSocket};
 
 use super::{Result, Server};
 
@@ -34,6 +34,7 @@ impl Server {
             }
             FirstOpenConnectionRequest::ID => {
                 let request = bstream.decode::<FirstOpenConnectionRequest>().unwrap();
+                log::debug!("MTU length: {}", request.mtu_length);
                 //TODO: protocol acceptor
                 if request.protocol_version != consts::PROTOCOL_VERSION {
                     socket
