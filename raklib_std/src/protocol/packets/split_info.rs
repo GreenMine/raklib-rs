@@ -19,7 +19,7 @@ impl Adapter for SplitInfo {
         })
     }
 
-    fn add(_this: Self, _bs: &mut BinaryStream)
+    fn add(&self, _bs: &mut BinaryStream)
     where
         Self: Sized,
     {

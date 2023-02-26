@@ -31,12 +31,12 @@ impl<'a> Adapter for RakNetString<'a> {
         unimplemented!("read RakNet string")
     }
 
-    fn add(this: Self, bs: &mut BinaryStream)
+    fn add(&self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
-        bs.add(this.length);
-        bs.add_slice(this.data);
+        bs.add(self.length);
+        bs.add_slice(self.data);
     }
 }
 

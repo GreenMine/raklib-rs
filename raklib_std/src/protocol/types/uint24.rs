@@ -27,13 +27,13 @@ impl Adapter for u24 {
         }
     }
 
-    fn add(this: Self, bs: &mut BinaryStream)
+    fn add(&self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
         unsafe {
             bs.add_slice(std::slice::from_raw_parts(
-                (&this.num as *const u32) as *const u8,
+                (&self.num as *const u32) as *const u8,
                 3,
             ))
         }

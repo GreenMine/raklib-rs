@@ -12,17 +12,16 @@ pub trait Adapter: Clone {
         Ok(unsafe { (*(res.as_ptr() as *const Self)).clone() }) //TODO: later fix it.
     }
 
-    fn add(mut this: Self, bs: &mut BinaryStream)
+    fn add(&self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
         unsafe {
-            let slice = std::slice::from_raw_parts_mut(
-                (&mut this as *mut Self) as *mut u8,
+            let slice = std::slice::from_raw_parts(
+                (self as *const Self) as *const u8,
                 std::mem::size_of::<Self>(),
             );
-            slice.reverse();
-            bs.add_slice(slice)
+            bs.add_slice_be(slice)
         }
     }
 }
@@ -53,18 +52,18 @@ impl Adapter for SocketAddr {
         ))
     }
 
-    fn add(this: Self, bs: &mut crate::stream::BinaryStream)
+    fn add(&self, bs: &mut crate::stream::BinaryStream)
     where
         Self: Sized,
     {
-        bs.add(if this.is_ipv4() { 4u8 } else { 6u8 });
+        bs.add(if self.is_ipv4() { 4u8 } else { 6u8 });
 
-        bs.add_slice(&match this.ip() {
+        bs.add_slice(&match self.ip() {
             IpAddr::V4(addr) => addr.octets(),
             IpAddr::V6(_addr) => unimplemented!(),
         });
 
-        bs.add(this.port());
+        bs.add(self.port());
         //from raw parts...............
     }
 }

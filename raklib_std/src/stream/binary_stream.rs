@@ -23,8 +23,9 @@ impl BinaryStream {
 
 //Setters
 impl BinaryStream {
+    // FIXME: provide data as reference
     pub fn add<T: Adapter>(&mut self, data: T) {
-        Adapter::add(data, self)
+        Adapter::add(&data, self)
     }
 
     /// There is no need to check for overflow,
@@ -32,6 +33,14 @@ impl BinaryStream {
     /// Therefore, panic will be an adequate solution
     pub fn add_slice(&mut self, slice: &[u8]) {
         self.data[self.p..self.p + slice.len()].copy_from_slice(slice);
+        self.p += slice.len();
+    }
+
+    pub fn add_slice_be(&mut self, slice: &[u8]) {
+        let dst = &mut self.data[self.p..self.p + slice.len()];
+        dst.copy_from_slice(slice);
+        dst.reverse();
+
         self.p += slice.len();
     }
 }

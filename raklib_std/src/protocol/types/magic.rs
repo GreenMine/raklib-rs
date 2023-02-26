@@ -22,11 +22,11 @@ impl Adapter for Magic {
         Ok(unsafe { *(bs.read_slice(16)?.as_ptr() as *const Magic) })
     }
 
-    fn add(this: Self, bs: &mut BinaryStream)
+    fn add(&self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
-        bs.add_slice(&this.data)
+        bs.add_slice(&self.data)
     }
 }
 
