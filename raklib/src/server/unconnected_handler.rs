@@ -4,9 +4,10 @@ use std::sync::Arc;
 use tokio::sync::mpsc::Sender;
 use tokio::sync::{mpsc, Mutex};
 
+use crate::net::UdpSocket;
 use raklib_std::{packet::Packet, stream::BinaryStream};
 
-use crate::server::{ConnectedData, Sessions, UdpSocket};
+use crate::server::{ConnectedData, Sessions};
 use crate::{
     protocol::{consts, packets::offline::*},
     server::session::Session,

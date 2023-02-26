@@ -1,6 +1,6 @@
 use flate2::{Decompress, FlushDecompress};
 
-use raklib::Server;
+use raklib::server::Server;
 use raklib_std::packet::Packet;
 
 #[tokio::main]
@@ -15,7 +15,9 @@ async fn main() {
         if let Some((user, mut listener)) = server.recv().await {
             loop {
                 if let Some(stream) = listener.recv().await {
-                    println!("new data");
+                    let data = stream.get_data();
+
+                    println!("new data(len: {})", data.len());
                 }
             }
         }

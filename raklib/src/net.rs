@@ -4,7 +4,7 @@ use tokio::net::{ToSocketAddrs, UdpSocket as RawUdpSocket};
 
 use raklib_std::packet::PacketEncode;
 
-pub(crate) struct UdpSocket {
+pub struct UdpSocket {
     address: SocketAddr,
     socket: RawUdpSocket,
 }
@@ -16,11 +16,16 @@ impl UdpSocket {
         Ok(Self { address, socket })
     }
 
-    pub(crate) fn get_bind_address(&self) -> &SocketAddr {
+    // FIXME: use own Result
+    pub async fn connect<T: ToSocketAddrs>(&mut self, addr: T) -> std::io::Result<()> {
+        self.socket.connect(addr).await
+    }
+
+    pub fn get_bind_address(&self) -> &SocketAddr {
         &self.address
     }
 
-    pub(crate) async fn send<T: PacketEncode, A: ToSocketAddrs>(
+    pub async fn send<T: PacketEncode, A: ToSocketAddrs>(
         &self,
         packet: &T,
         addr: A,

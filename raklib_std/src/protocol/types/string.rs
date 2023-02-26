@@ -1,4 +1,5 @@
 use std::ops::{Index, Range};
+use std::str::Utf8Error;
 
 use crate::stream::{Adapter, BinaryStream, Result};
 
@@ -53,5 +54,13 @@ impl<'a> Index<Range<usize>> for RakNetString<'a> {
 
     fn index(&self, range: Range<usize>) -> &Self::Output {
         &self.data[range]
+    }
+}
+
+impl<'a> std::convert::TryInto<&'a str> for RakNetString<'a> {
+    type Error = Utf8Error;
+
+    fn try_into(self) -> std::result::Result<&'a str, Self::Error> {
+        std::str::from_utf8(self.data)
     }
 }

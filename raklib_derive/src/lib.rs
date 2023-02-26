@@ -1,4 +1,8 @@
+#![feature(type_name_of_val)]
+
 use proc_macro::TokenStream;
+use std::any::type_name_of_val;
+use syn::{ExprPath, PathSegment, ReturnType, Type};
 
 use quote::quote;
 use syn::DeriveInput;
@@ -56,15 +60,15 @@ pub fn packet_decode(item: TokenStream) -> TokenStream {
         .map(|sf| match sf {
             StructField::Basic(n) => {
                 names.push(quote!(#n));
-                quote!(#n)
+                quote!(
+                    let #n = bstream.read()?;
+                )
             }
-            StructField::Const(_) => unimplemented!("const fields in PacketDecode"),
+            StructField::Const(ts) => {
+                unimplemented!("consts parse inside PacketDecode. Later try to use const-eval",)
+            }
         })
-        .for_each(|c| {
-            result_quote.extend(quote!(
-                let #c = bstream.read()?;
-            ))
-        });
+        .for_each(|c| result_quote.extend(c));
 
     let expanded = quote! {
         impl #impl_generics raklib_std::packet::PacketDecode for #struct_name #ty_generics #where_clause {

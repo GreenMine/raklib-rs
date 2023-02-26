@@ -9,10 +9,11 @@ use tokio::sync::{mpsc, Mutex};
 
 use raklib_std::stream::BinaryStream;
 
+use crate::net::UdpSocket;
 use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
 use crate::server::ConnectedData;
 
-use super::{Sessions, UdpSocket};
+use super::Sessions;
 
 pub struct Server {
     pub(super) socket: Arc<UdpSocket>, // FIXME: fuck RefCounter

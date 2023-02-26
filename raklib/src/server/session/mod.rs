@@ -11,7 +11,7 @@ pub use status::Status;
 
 use crate::protocol::packets::connected::*;
 
-use super::UdpSocket;
+use crate::net::UdpSocket;
 
 mod status;
 
