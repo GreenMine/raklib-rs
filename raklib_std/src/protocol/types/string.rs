@@ -64,3 +64,23 @@ impl<'a> std::convert::TryInto<&'a str> for RakNetString<'a> {
         std::str::from_utf8(self.data)
     }
 }
+
+impl Adapter for String {
+    fn read(bs: &mut BinaryStream) -> Result<Self>
+    where
+        Self: Sized,
+    {
+        let len: u16 = bs.read()?;
+        log::info!("Len of string: {}", len);
+        let raw_str = bs.read_slice(len as usize)?;
+        Ok(String::from_utf8_lossy(raw_str).to_string())
+    }
+
+    fn add(&self, bs: &mut BinaryStream)
+    where
+        Self: Sized,
+    {
+        bs.add(self.len() as u16);
+        bs.add_slice(self.as_bytes())
+    }
+}

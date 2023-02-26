@@ -15,31 +15,41 @@ impl Packet for OfflinePingPacket {
     const ID: u8 = 0x01;
 }
 
-#[derive(raklib_std::derive::PacketEncode)]
-pub struct OfflinePongPacket<'a> {
+pub struct OfflinePongPacket {
     pub time: u64,
-    #[const_fields(consts::SERVER_GUID, types::MAGIC)]
-    pub server_id_string: RakNetString<'a>,
+    pub server_id_string: String,
 }
 
-impl<'a> OfflinePongPacket<'a> {
-    pub fn new(time: u64, server_id_string: &'a str) -> Self {
+impl OfflinePongPacket {
+    pub fn new(time: u64, server_id_string: &str) -> Self {
         Self {
             time,
-            server_id_string: RakNetString::from_string(server_id_string),
+            server_id_string: server_id_string.to_string(),
         }
     }
 }
 
-impl<'a> PacketDecode for OfflinePongPacket<'a> {
+impl raklib_std::packet::PacketEncode for OfflinePongPacket {
+    fn encode_payload(&self, bstream: &mut raklib_std::stream::BinaryStream) {
+        bstream.add(self.time);
+        bstream.add(consts::SERVER_GUID);
+        bstream.add(types::MAGIC);
+        bstream.add(&self.server_id_string);
+    }
+}
+
+impl PacketDecode for OfflinePongPacket {
     fn decode(bstream: &mut BinaryStream) -> raklib_std::stream::Result<Self>
     where
         Self: Sized,
     {
         let time: u64 = bstream.read()?;
         let _: u64 = bstream.read()?;
-        let _: Magic = bstream.read()?;
-        let server_id_string: RakNetString = bstream.read()?;
+        let magic: Magic = bstream.read()?;
+
+        log::info!("Magic validation: {}", magic.is_valid());
+
+        let server_id_string: String = bstream.read()?;
 
         Ok(Self {
             time,
@@ -48,9 +58,9 @@ impl<'a> PacketDecode for OfflinePongPacket<'a> {
     }
 }
 
-impl<'a> Packet for OfflinePongPacket<'a> {
+impl Packet for OfflinePongPacket {
     const ID: u8 = 0x1c;
     fn packet_size(&self) -> usize {
-        1 + 8 + 8 + 16 + (2 + self.server_id_string.length as usize)
+        1 + 8 + 8 + 16 + (2 + self.server_id_string.len() as usize)
     }
 }
