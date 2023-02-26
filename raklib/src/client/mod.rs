@@ -2,6 +2,9 @@ use crate::net::UdpSocket;
 use raklib_std::packet::PacketEncode;
 use std::net::SocketAddr;
 
+mod ping;
+pub use ping::ping;
+
 pub struct Client {
     pub socket: UdpSocket,
     addr: SocketAddr,
@@ -11,9 +14,6 @@ impl Client {
     pub async fn connect(addr: SocketAddr) -> Self {
         let local_addr = "0.0.0.0:0".parse().unwrap();
         let mut socket = UdpSocket::bind(local_addr).await.unwrap();
-
-        // TODO: useless, because of in send we are provide addr
-        socket.connect(addr).await.unwrap();
 
         Self { socket, addr }
     }
