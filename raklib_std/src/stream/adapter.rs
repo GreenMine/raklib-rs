@@ -6,29 +6,37 @@ use super::Result;
 pub trait Adapter: Clone {
     fn read(bs: &mut BinaryStream) -> Result<Self>
     where
-        Self: Sized,
-    {
-        let res = bs.read_slice_be(std::mem::size_of::<Self>())?;
-        Ok(unsafe { (*(res.as_ptr() as *const Self)).clone() }) //TODO: later fix it.
-    }
+        Self: Sized;
 
     fn add(&self, bs: &mut BinaryStream)
     where
-        Self: Sized,
-    {
-        unsafe {
-            let slice = std::slice::from_raw_parts(
-                (self as *const Self) as *const u8,
-                std::mem::size_of::<Self>(),
-            );
-            bs.add_slice_be(slice)
-        }
-    }
+        Self: Sized;
 }
 
 macro_rules! impl_for_base_type {
     ( $($t:ty),* ) => {
-    $( impl Adapter for $t {}) *
+    $( impl Adapter for $t {
+        fn read(bs: &mut BinaryStream) -> Result<Self>
+        where
+            Self: Sized,
+        {
+            let res = bs.read_slice_be(std::mem::size_of::<Self>())?;
+            Ok(unsafe { (*(res.as_ptr() as *const Self)).clone() }) //TODO: later fix it.
+        }
+
+        fn add(&self, bs: &mut BinaryStream)
+        where
+            Self: Sized,
+        {
+            unsafe {
+                let slice = std::slice::from_raw_parts(
+                    (self as *const Self) as *const u8,
+                    std::mem::size_of::<Self>(),
+                );
+                bs.add_slice_be(slice)
+            }
+        }
+    }) *
     }
 }
 
@@ -68,18 +76,18 @@ impl Adapter for SocketAddr {
     }
 }
 
-/*impl<T: BSAdapter> BSAdapter for Vec<T> {
-    fn add(this: Self, bs: &mut BinaryStream)
+impl<T: Adapter> Adapter for &T {
+    fn read(bs: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {
-        this.into_iter().for_each(|p| bs.add(p));
+        unimplemented!()
     }
 
-    fn read(_bs: &mut BinaryStream) -> Self
+    fn add(&self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
-        unimplemented!("read operation for Vec<T>")
+        T::add(self, bs)
     }
-}*/
+}
