@@ -9,7 +9,7 @@ use tokio::sync::{mpsc, Mutex};
 
 use raklib_std::stream::BinaryStream;
 
-use crate::net::UdpSocket;
+use crate::net::{Error as NetError, UdpSocket};
 use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
 use crate::server::ConnectedData;
 
@@ -25,7 +25,7 @@ pub struct Server {
 unsafe impl Send for Server {}
 
 impl Server {
-    pub async fn bind(address: SocketAddr) -> std::io::Result<Self> {
+    pub async fn bind(address: SocketAddr) -> Result<Self, NetError> {
         Ok(Self {
             socket: Arc::new(UdpSocket::bind(address).await?),
             _start_time: Instant::now(),

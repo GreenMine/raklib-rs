@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, ops::Deref};
+use std::{io, net::SocketAddr, ops::Deref};
 
 use tokio::net::{ToSocketAddrs, UdpSocket as RawUdpSocket};
 
@@ -10,15 +10,13 @@ pub struct UdpSocket {
 }
 
 impl UdpSocket {
-    pub(crate) async fn bind(address: SocketAddr) -> std::io::Result<Self> {
+    pub(crate) async fn bind<A: ToSocketAddrs + Copy>(address: A) -> Result<Self, Error> {
         let socket = RawUdpSocket::bind(address).await?;
 
-        Ok(Self { address, socket })
-    }
-
-    // FIXME: use own Result
-    pub async fn connect<T: ToSocketAddrs>(&mut self, addr: T) -> std::io::Result<()> {
-        self.socket.connect(addr).await
+        Ok(Self {
+            address: lookup_host(address).await?,
+            socket,
+        })
     }
 
     pub fn get_bind_address(&self) -> &SocketAddr {
@@ -50,4 +48,19 @@ impl Deref for UdpSocket {
     fn deref(&self) -> &Self::Target {
         &self.socket
     }
+}
+
+#[derive(thiserror::Error, Debug)]
+pub enum Error {
+    #[error(transparent)]
+    Io(#[from] io::Error),
+    #[error("invalid address lookup")]
+    Lookup,
+}
+
+pub async fn lookup_host<A: ToSocketAddrs>(address: A) -> Result<SocketAddr, Error> {
+    Ok(tokio::net::lookup_host(address)
+        .await?
+        .next()
+        .ok_or(Error::Lookup)?)
 }

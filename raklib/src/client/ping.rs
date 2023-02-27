@@ -1,12 +1,12 @@
-use crate::client::Client;
+use crate::client::{Client, Error};
 use crate::protocol::packets::offline::{OfflinePingPacket, OfflinePongPacket};
 use raklib_std::packet::Packet;
 use raklib_std::protocol::types::MAGIC;
-use raklib_std::stream::{BinaryStream, EndOfStream};
+use raklib_std::stream::BinaryStream;
 use std::net::SocketAddr;
 
-pub async fn ping(addr: SocketAddr) -> Result<OfflinePongPacket, ()> {
-    let mut client = Client::connect(addr).await;
+pub async fn ping(addr: SocketAddr) -> Result<OfflinePongPacket, Error> {
+    let mut client = Client::connect(addr).await?;
 
     client
         .send(&OfflinePingPacket {
@@ -25,7 +25,7 @@ pub async fn ping(addr: SocketAddr) -> Result<OfflinePongPacket, ()> {
             match packet_id {
                 OfflinePongPacket::ID => {
                     // FIXME: forget about error
-                    let pong = bstream.decode::<OfflinePongPacket>().map_err(|_| ())?;
+                    let pong = bstream.decode::<OfflinePongPacket>()?;
 
                     return Ok(pong);
                 }
