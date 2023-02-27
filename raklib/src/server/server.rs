@@ -136,17 +136,3 @@ impl Server {
         str + "\n"
     }
 }
-
-impl Drop for Server {
-    fn drop(&mut self) {
-        //FIXME: weird, but for now it's ok
-        futures::executor::block_on(async {
-            for session in self.sessions.lock().await.values_mut() {
-                if session.status.is_connected() {
-                    session.disconnect();
-                    session.update().await;
-                }
-            }
-        })
-    }
-}
