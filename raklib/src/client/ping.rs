@@ -3,10 +3,10 @@ use crate::protocol::packets::offline::{OfflinePingPacket, OfflinePongPacket};
 use raklib_std::packet::Packet;
 use raklib_std::protocol::types::MAGIC;
 use raklib_std::stream::BinaryStream;
-use std::net::SocketAddr;
+use tokio::net::ToSocketAddrs;
 
-pub async fn ping(addr: SocketAddr) -> Result<OfflinePongPacket, Error> {
-    let mut client = Client::connect(addr).await?;
+pub async fn ping<A: ToSocketAddrs>(address: A) -> Result<OfflinePongPacket, Error> {
+    let mut client = Client::connect(address).await?;
 
     client
         .send(&OfflinePingPacket {
