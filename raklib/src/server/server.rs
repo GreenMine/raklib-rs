@@ -94,12 +94,9 @@ impl Server {
                     if !session.status.is_connected() {}
                 }
 
-                let tick_lead_ms = tick_start.elapsed().as_millis();
+                let tick_lead_ms = tick_start.elapsed();
                 if tick_lead_ms < TIME_PER_TICK {
-                    tokio::time::sleep(Duration::from_millis(
-                        (TIME_PER_TICK - tick_lead_ms) as u64,
-                    ))
-                    .await;
+                    tokio::time::sleep(TIME_PER_TICK - tick_lead_ms).await;
                 }
             }
         });
