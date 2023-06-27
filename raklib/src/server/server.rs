@@ -56,7 +56,10 @@ impl Server {
                 //TODO: maybe need to rewrite it(now pasted from pmmp raklib implementation)
                 for _ in 0..100 {
                     if let Ok((read_bytes, addr)) = socket.try_recv_from(bstream.get_raw_mut()) {
-                        bstream.get_raw_mut().truncate(read_bytes); //FIXME: truncate free truncated elements memory block
+                        // TODO: got out of unsafe(may using in bstream, but not there)
+                        // SAFETY: u8 doesn't need to drop
+                        unsafe { bstream.get_raw_mut().set_len(read_bytes); }
+
                         let packet_id = bstream.read::<u8>().unwrap();
 
                         if packet_id & Datagram::BITFLAG_VALID != 0 {
