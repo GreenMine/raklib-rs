@@ -22,7 +22,7 @@ impl Ack {
     pub fn from_packets(ack_packets: &mut Vec<u24>) -> Self {
         let mut u32_ack = ack_packets
             .iter()
-            .map(|v| u32::from(*v))
+            .map(|&v| u32::from(v))
             .collect::<Vec<_>>();
 
         u32_ack.sort();
@@ -104,14 +104,14 @@ impl PacketEncode for Ack {
 
         for record in self.records.iter() {
             match record {
-                Record::Single(s) => {
+                Record::Single(ref s) => {
                     bstream.add(true);
-                    bstream.add(*s);
+                    bstream.add(s);
                 }
-                Record::Range(r) => {
+                Record::Range(ref r) => {
                     bstream.add(false);
-                    bstream.add(*r.start());
-                    bstream.add(*r.end());
+                    bstream.add(r.start());
+                    bstream.add(r.end());
                 }
             }
         }
