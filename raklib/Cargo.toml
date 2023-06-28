@@ -7,8 +7,9 @@ license = "MIT"
 repository = "https://github.com/GreenMine/raklib-rs"
 
 [dependencies]
-tokio = { version = "1.17.0", features = ["net", "sync", "macros", "rt-multi-thread", "time"] }
+tokio = { version = "1.25.0", features = ["net", "sync", "macros", "rt-multi-thread", "time"] }
 futures = "0.3"
+thiserror = "1.0.0"
 
 log = "0.4.0"
 

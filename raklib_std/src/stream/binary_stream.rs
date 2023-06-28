@@ -1,6 +1,7 @@
 use crate::packet::PacketDecode;
+use crate::stream::Error;
 
-use super::{Adapter, EndOfStream, Result};
+use super::{Adapter, Result};
 
 #[derive(Debug)]
 pub struct BinaryStream {
@@ -61,7 +62,10 @@ impl BinaryStream {
     //FIXME: Check the overflow
     pub fn read_slice(&mut self, n: usize) -> Result<&mut [u8]> {
         if self.p + n > self.data.len() {
-            return Err(EndOfStream {});
+            return Err(Error::EndOfStream {
+                try_to_read: n,
+                actual_left: self.data.len() - self.p,
+            });
         }
 
         let result = &mut self.data[self.p..self.p + n];

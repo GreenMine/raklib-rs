@@ -9,7 +9,7 @@ use tokio::sync::{mpsc, Mutex};
 
 use raklib_std::stream::BinaryStream;
 
-use crate::net::UdpSocket;
+use crate::net::{Error as NetError, UdpSocket};
 use crate::protocol::{consts::TIME_PER_TICK, packets::connected::Datagram};
 use crate::server::ConnectedData;
 
@@ -25,7 +25,7 @@ pub struct Server {
 unsafe impl Send for Server {}
 
 impl Server {
-    pub async fn bind(address: SocketAddr) -> std::io::Result<Self> {
+    pub async fn bind(address: SocketAddr) -> Result<Self, NetError> {
         Ok(Self {
             socket: Arc::new(UdpSocket::bind(address).await?),
             _start_time: Instant::now(),
@@ -97,12 +97,9 @@ impl Server {
                     if !session.status.is_connected() {}
                 }
 
-                let tick_lead_ms = tick_start.elapsed().as_millis();
+                let tick_lead_ms = tick_start.elapsed();
                 if tick_lead_ms < TIME_PER_TICK {
-                    tokio::time::sleep(Duration::from_millis(
-                        (TIME_PER_TICK - tick_lead_ms) as u64,
-                    ))
-                    .await;
+                    tokio::time::sleep(TIME_PER_TICK - tick_lead_ms).await;
                 }
             }
         });
@@ -137,19 +134,5 @@ impl Server {
         });
 
         str + "\n"
-    }
-}
-
-impl Drop for Server {
-    fn drop(&mut self) {
-        //FIXME: weird, but for now it's ok
-        futures::executor::block_on(async {
-            for session in self.sessions.lock().await.values_mut() {
-                if session.status.is_connected() {
-                    session.disconnect();
-                    session.update().await;
-                }
-            }
-        })
     }
 }
