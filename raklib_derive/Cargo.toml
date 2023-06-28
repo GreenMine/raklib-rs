@@ -10,8 +10,8 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-quote = "*"
-syn = { version = "*", features = ["extra-traits"] }
+quote = "1"
+syn = { version = "1.0.109", features = ["extra-traits"] }
 proc-macro2 = "*"
 
 [dev-dependencies]

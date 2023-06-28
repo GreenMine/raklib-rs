@@ -1,6 +1,5 @@
-use proc_macro2::Ident;
+use proc_macro2::{Ident, TokenStream, TokenTree};
 use quote::{
-    __private::{TokenStream, TokenTree},
     quote,
 };
 use syn::{Data, DeriveInput, Fields};
