@@ -1,10 +1,7 @@
 mod server;
-mod new_server;
-pub mod session;
 mod unconnected_handler;
 
 pub use server::Server;
-pub use new_server::Server as NewServer;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -15,7 +12,7 @@ pub enum Error {
 }
 pub type Result<T> = std::result::Result<T, Error>;
 
-pub type Sessions = std::collections::HashMap<std::net::SocketAddr, session::Session>;
+pub type Sessions = dashmap::DashMap<std::net::SocketAddr, crate::session::Session>;
 pub type ConnectedData = (
     std::net::SocketAddr,
     tokio::sync::mpsc::Receiver<raklib_std::stream::BinaryStream>,

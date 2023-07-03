@@ -16,7 +16,7 @@ pub struct Client {
 
 impl Client {
     pub async fn connect<A: tokio::net::ToSocketAddrs>(address: A) -> Result<Self, Error> {
-        let mut client = Client::bind(address).await?;
+        let client = Client::bind(address).await?;
 
         // Должен быть дополнительный поток, который занимается тем, что в цикле ловит пришедшие
         // пакеты, и смотрит очередь пакетов, которые в данный момент ждут

@@ -10,7 +10,7 @@ use raklib_std::{packet::Packet, stream::BinaryStream};
 use crate::server::{ConnectedData, Sessions};
 use crate::{
     protocol::{consts, packets::offline::*},
-    server::session::Session,
+    session::Session,
 };
 
 use super::{Result, Server};
@@ -66,9 +66,8 @@ impl Server {
             }
             _ => {
                 log::error!(
-                    "Unimplemented packet: 0x{:02X}\nRead data:\n{}",
+                    "Unimplemented packet: 0x{:02X}",
                     packet_id,
-                    Self::bin_to_hex_table(&bstream.get_raw()[..read_bytes])
                 );
             }
         }

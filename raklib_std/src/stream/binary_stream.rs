@@ -1,4 +1,4 @@
-use crate::packet::{PacketDecode, Packet};
+use crate::packet::PacketDecode;
 use crate::stream::Error;
 
 use super::{Adapter, Result};

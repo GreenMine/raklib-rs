@@ -3,8 +3,6 @@ name = "raklib_examples"
 version = "0.0.0"
 edition = "2021"
 
-panic = "unwind"
-
 [dependencies]
 raklib = { path = "../raklib" }
 raklib_std = { path = "../raklib_std" }

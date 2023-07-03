@@ -11,17 +11,19 @@ async fn main() {
     let mut server = Server::bind(address).await.unwrap();
     server.run().await.unwrap();
 
-    'main: loop {
-        if let Some((user, mut listener)) = server.recv().await {
-            loop {
-                if let Some(stream) = listener.recv().await {
-                    let data = stream.get_data();
+    // 'main: loop {
+    //     if let Some((user, mut listener)) = server.recv().await {
+    //         loop {
+    //             if let Some(stream) = listener.recv().await {
+    //                 let data = stream.get_data();
+    //
+    //                 println!("new data(len: {})", data.len());
+    //             }
+    //         }
+    //     }
+    // }
 
-                    println!("new data(len: {})", data.len());
-                }
-            }
-        }
-    }
+    loop {}
 }
 
 #[derive(Debug, raklib_std::derive::PacketDecode, raklib_std::derive::PacketEncode)]
