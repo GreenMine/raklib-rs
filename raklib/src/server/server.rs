@@ -91,12 +91,8 @@ impl Server {
                 }
 
                 Self::update_sessions(Arc::clone(&sessions)).await; //FIXME: rewrite
-                for session in sessions.lock().await.values_mut() {
-                    session.update().await;
 
-                    if !session.status.is_connected() {}
-                }
-
+                // TODO: try this out: https://docs.rs/tokio/latest/tokio/time/fn.interval.html
                 let tick_lead_ms = tick_start.elapsed();
                 if tick_lead_ms < TIME_PER_TICK {
                     tokio::time::sleep(TIME_PER_TICK - tick_lead_ms).await;

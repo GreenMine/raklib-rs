@@ -1,8 +1,10 @@
 mod server;
+mod new_server;
 pub mod session;
 mod unconnected_handler;
 
 pub use server::Server;
+pub use new_server::Server as NewServer;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {

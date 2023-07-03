@@ -5,8 +5,9 @@ use raklib_std::protocol::types::MAGIC;
 use raklib_std::stream::BinaryStream;
 use tokio::net::ToSocketAddrs;
 
+// FIXME: move just to client
 pub async fn ping<A: ToSocketAddrs>(address: A) -> Result<OfflinePongPacket, Error> {
-    let mut client = Client::connect(address).await?;
+    let mut client = Client::bind(address).await?;
 
     client
         .send(&OfflinePingPacket {

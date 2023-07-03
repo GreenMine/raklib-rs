@@ -16,6 +16,21 @@ pub struct Client {
 
 impl Client {
     pub async fn connect<A: tokio::net::ToSocketAddrs>(address: A) -> Result<Self, Error> {
+        let mut client = Client::bind(address).await?;
+
+        // Должен быть дополнительный поток, который занимается тем, что в цикле ловит пришедшие
+        // пакеты, и смотрит очередь пакетов, которые в данный момент ждут
+        //
+        //
+        //
+
+        unimplemented!()
+    }
+    
+}
+
+impl Client {
+    pub(super) async fn bind<A: tokio::net::ToSocketAddrs>(address: A) -> Result<Self, Error> {
         let addr = crate::net::lookup_host(address).await?;
 
         let socket = UdpSocket::bind("0.0.0.0:0").await.unwrap();
@@ -23,7 +38,7 @@ impl Client {
         Ok(Self { socket, addr })
     }
 
-    pub async fn send<T: PacketEncode>(&mut self, packet: &T) -> std::io::Result<usize> {
+    pub(super) async fn send<T: PacketEncode>(&mut self, packet: &T) -> std::io::Result<usize> {
         self.socket.send(packet, self.addr).await
     }
 }

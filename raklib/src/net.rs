@@ -23,6 +23,8 @@ impl UdpSocket {
         &self.address
     }
 
+    // FIXME: think about this generic. Because of genertic, compiler generate a lot of
+    // implementaiton of UdpSocker, for each type of Packet
     pub async fn send<T: PacketEncode, A: ToSocketAddrs>(
         &self,
         packet: &T,
