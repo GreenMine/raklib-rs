@@ -1,8 +1,4 @@
-#![feature(type_name_of_val)]
-
 use proc_macro::TokenStream;
-use std::any::type_name_of_val;
-use syn::{ExprPath, PathSegment, ReturnType, Type};
 
 use quote::quote;
 use syn::DeriveInput;
@@ -64,7 +60,7 @@ pub fn packet_decode(item: TokenStream) -> TokenStream {
                     let #n = bstream.read()?;
                 )
             }
-            StructField::Const(ts) => {
+            StructField::Const(_ts) => {
                 unimplemented!("consts parse inside PacketDecode. Later try to use const-eval",)
             }
         })
