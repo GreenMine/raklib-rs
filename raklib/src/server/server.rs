@@ -1,17 +1,16 @@
 use std::net::SocketAddr;
 
+use super::Sessions;
 use crate::{
     dialogue::{Dialogue, DialogueHandler},
     net::{Error as NetError, UdpSocket},
+    protocol::{consts, packets::offline::*},
     session::Session,
-    protocol::{consts, packets::offline::*}
 };
-use super::Sessions;
 use raklib_std::packet::Packet;
 
-use tokio::sync::mpsc;
 use dashmap::mapref::one::RefMut;
-
+use tokio::sync::mpsc;
 
 pub struct Server {
     pub(super) socket: UdpSocket,

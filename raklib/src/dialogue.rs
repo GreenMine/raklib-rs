@@ -26,7 +26,6 @@ pub enum Error {
 }
 pub type Result<T> = std::result::Result<T, Error>;
 
-
 pub trait DialogueHandler {
     type SessionRef<'a>: std::ops::Deref<Target = crate::session::Session> + std::ops::DerefMut
     where
