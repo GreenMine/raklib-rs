@@ -71,8 +71,6 @@ impl<'a, T: DialogueHandler + Send + Sync + 'a> Dialogue<T> {
                     // SAFETY: u8 doesn't need to drop
                     unsafe { bstream.get_raw_mut().set_len(read_bytes); }
 
-                    log::debug!("Got {} bytes.", read_bytes);
-
                     let packet_id = bstream.read::<u8>().unwrap();
                     if packet_id & Datagram::BITFLAG_VALID != 0 {
                         if let Some(session) = self.handler.get_session(addr).as_deref_mut() {
