@@ -1,11 +1,7 @@
-use std::{net::SocketAddr, sync::Arc};
-
 use raklib_std::{protocol::packets::Datagram, stream::BinaryStream};
+use std::net::SocketAddr;
 
-use crate::{
-    net::UdpSocket,
-    server::{Server, Sessions},
-};
+use crate::net::UdpSocket;
 
 // Идея в том, чтобы описать поведение, в котором должны общаться клиент и сервер(в данном случае
 // эту структуру буду использовать оба). Т.е. нужно сделать этот класс таким, чтобы его можно было
@@ -30,6 +26,7 @@ pub enum Error {
 }
 pub type Result<T> = std::result::Result<T, Error>;
 
+
 pub trait DialogueHandler {
     type SessionRef<'a>: std::ops::Deref<Target = crate::session::Session> + std::ops::DerefMut
     where
@@ -44,7 +41,6 @@ pub trait DialogueHandler {
         packet_id: u8,
         bstream: &mut raklib_std::stream::BinaryStream,
     ) -> crate::dialogue::Result<()>;
-    fn on_packet();
 }
 
 pub struct Dialogue<T: DialogueHandler> {
@@ -52,16 +48,13 @@ pub struct Dialogue<T: DialogueHandler> {
     socket: UdpSocket,
 }
 
-impl<'a, T: DialogueHandler + Send + Sync + 'a> Dialogue<T> {
+impl<'a, T: DialogueHandler> Dialogue<T> {
     pub fn new(handler: T, socket: UdpSocket) -> Self {
         Self { handler, socket }
     }
 
-    pub async fn run(self)
-    where
-        <T as DialogueHandler>::SessionRef<'a>: Send + Sync,
-    {
-        let mut interval = tokio::time::interval(std::time::Duration::from_millis(20));
+    pub async fn run(self) {
+        let mut interval = tokio::time::interval(crate::protocol::consts::TIME_PER_TICK);
         let mut bstream = BinaryStream::with_len(2048);
 
         loop {

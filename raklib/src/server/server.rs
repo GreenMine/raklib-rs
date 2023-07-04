@@ -96,13 +96,14 @@ impl DialogueHandler for ServerHandler {
                 }
             }
             SecondOpenConnectionRequest::ID => {
+                // TODO: save mtu_length
                 let request2 = bstream.decode::<SecondOpenConnectionRequest>().unwrap();
                 let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
                 socket.send(&reply2, addr).await?;
                 log::info!("Create new session for {}!", addr);
 
-                let (connected_tx, connected_rx) = mpsc::channel(2048);
+                let (connected_tx, connected_rx) = mpsc::channel(64);
                 let session = Session::new(addr, connected_tx, socket.clone());
                 self.sessions.insert(addr, session);
 
@@ -115,9 +116,5 @@ impl DialogueHandler for ServerHandler {
         }
 
         Ok(())
-    }
-
-    fn on_packet() {
-        todo!()
     }
 }
