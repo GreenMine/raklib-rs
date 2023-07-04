@@ -1,7 +1,5 @@
 use proc_macro2::{Ident, TokenStream, TokenTree};
-use quote::{
-    quote,
-};
+use quote::quote;
 use syn::{Data, DeriveInput, Fields};
 
 pub enum StructField {
