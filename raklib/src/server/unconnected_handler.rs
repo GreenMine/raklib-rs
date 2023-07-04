@@ -19,7 +19,7 @@ impl Server {
     pub(crate) async fn unconnected_handler(
         socket: &Arc<UdpSocket>,
         sender: &Sender<ConnectedData>,
-        sessions: &Arc<Mutex<Sessions>>,
+        sessions: &Arc<Sessions>,
         packet_id: u8,
         bstream: &mut BinaryStream,
         addr: SocketAddr,
@@ -59,7 +59,7 @@ impl Server {
 
                 let (connected_tx, connected_rx) = mpsc::channel(2048);
                 let session = Session::new(addr, connected_tx, socket.clone());
-                sessions.lock().await.insert(addr, session);
+                sessions.insert(addr, session);
 
                 // notify about new connection
                 sender.send((addr, connected_rx)).await.unwrap();

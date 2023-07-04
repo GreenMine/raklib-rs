@@ -17,7 +17,7 @@ mod status;
 
 pub struct Session {
     address: SocketAddr,
-    socket: Arc<UdpSocket>,
+    socket: UdpSocket,
     channel: Sender<BinaryStream>,
     pub(crate) status: Status,
     datagram: Datagram,
@@ -31,7 +31,7 @@ impl Session {
     pub(crate) fn new(
         address: SocketAddr,
         channel: Sender<BinaryStream>,
-        socket: Arc<UdpSocket>,
+        socket: UdpSocket,
     ) -> Session {
         let mut session = Session {
             address,

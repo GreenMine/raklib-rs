@@ -6,7 +6,7 @@ pub mod net;
 
 pub mod client;
 pub mod protocol;
-pub mod session;
 pub mod server;
+pub mod session;
 
 pub mod dialogue;

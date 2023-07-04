@@ -1,12 +1,14 @@
-use std::{io, net::SocketAddr, ops::Deref};
+use std::{io, net::SocketAddr, ops::Deref, sync::Arc};
 
 use tokio::net::{ToSocketAddrs, UdpSocket as RawUdpSocket};
 
 use raklib_std::packet::PacketEncode;
 
+#[derive(Clone)]
 pub struct UdpSocket {
     address: SocketAddr,
-    socket: RawUdpSocket,
+    // TODO: Arc might be here?
+    socket: Arc<RawUdpSocket>,
 }
 
 impl UdpSocket {
@@ -15,7 +17,7 @@ impl UdpSocket {
 
         Ok(Self {
             address: lookup_host(address).await?,
-            socket,
+            socket: Arc::new(socket),
         })
     }
 

@@ -26,7 +26,6 @@ impl Client {
 
         unimplemented!()
     }
-    
 }
 
 impl Client {
