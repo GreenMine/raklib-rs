@@ -26,7 +26,7 @@ impl Server {
         })
     }
 
-    pub async fn run(self) -> std::io::Result<Listener> {
+    pub async fn run(self) -> Listener {
         let (tx, rx) = mpsc::channel(64);
 
         let handler = ServerHandler {
@@ -36,7 +36,7 @@ impl Server {
 
         tokio::spawn(Dialogue::new(handler, self.socket).run());
 
-        Ok(Listener { receiver: rx })
+        Listener { receiver: rx }
     }
 }
 
