@@ -1,6 +1,6 @@
 use std::net::SocketAddr;
 
-use super::Sessions;
+use super::{ConnectedData, Sessions};
 use crate::{
     dialogue::{Dialogue, DialogueHandler},
     net::{Error as NetError, UdpSocket},
@@ -11,6 +11,7 @@ use raklib_std::packet::Packet;
 
 use dashmap::mapref::one::RefMut;
 use tokio::sync::mpsc;
+use tokio_stream::Stream;
 
 pub struct Server {
     pub(super) socket: UdpSocket,
@@ -25,19 +26,38 @@ impl Server {
         })
     }
 
-    pub async fn run(self) -> std::io::Result<()> {
+    pub async fn run(self) -> std::io::Result<Listener> {
+        let (tx, rx) = mpsc::channel(64);
+
         let handler = ServerHandler {
             sessions: dashmap::DashMap::new(),
+            sender: tx,
         };
 
         tokio::spawn(Dialogue::new(handler, self.socket).run());
 
-        Ok(())
+        Ok(Listener { receiver: rx })
+    }
+}
+
+pub struct Listener {
+    receiver: mpsc::Receiver<ConnectedData>,
+}
+
+impl Stream for Listener {
+    type Item = ConnectedData;
+
+    fn poll_next(
+        mut self: std::pin::Pin<&mut Self>,
+        cx: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Option<Self::Item>> {
+        self.receiver.poll_recv(cx)
     }
 }
 
 struct ServerHandler {
     sessions: Sessions,
+    sender: mpsc::Sender<ConnectedData>,
 }
 
 impl DialogueHandler for ServerHandler {
@@ -107,7 +127,7 @@ impl DialogueHandler for ServerHandler {
                 self.sessions.insert(addr, session);
 
                 // notify about new connection
-                // TODO: sender.send((addr, connected_rx)).await.unwrap();
+                self.sender.send((addr, connected_rx)).await.unwrap();
             }
             _ => {
                 log::error!("Unimplemented packet: 0x{:02X}", packet_id,);

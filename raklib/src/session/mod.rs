@@ -145,6 +145,9 @@ impl Session {
         list.push(packet);
 
         if (list.len() as i32) == split_info.fragment_amount {
+            // TODO: Try to implement another strategy, where we prealloc vector with len =
+            // split_info.fragmen_amount * self.mtu_length, and just push to it without sorting
+
             list.sort_by(|a, b| {
                 a.split_info
                     .unwrap()
@@ -152,7 +155,7 @@ impl Session {
                     .cmp(&b.split_info.unwrap().fragment_index)
             });
 
-            let mut buf: Vec<u8> = Vec::with_capacity(list.iter().map(|p| p.buffer.len()).sum()); //TODO: with_capacity?
+            let mut buf: Vec<u8> = Vec::with_capacity(list.iter().map(|p| p.buffer.len()).sum());
 
             list.iter().for_each(|p| buf.extend_from_slice(&p.buffer));
 
