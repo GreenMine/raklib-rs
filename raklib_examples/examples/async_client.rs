@@ -1,7 +1,7 @@
 use raklib::client;
 use std::net::ToSocketAddrs;
 
-const SERVER_ADDR: &'static str = "mps.mc-complex.com:19132";
+const SERVER_ADDR: &'static str = "127.0.0.1:19135";
 
 #[tokio::main]
 async fn main() {

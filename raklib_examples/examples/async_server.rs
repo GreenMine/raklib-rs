@@ -8,8 +8,20 @@ async fn main() {
     env_logger::init();
 
     let address = "0.0.0.0:19135".parse().unwrap();
-    let mut server = Server::bind(address).await.unwrap();
-    server.run().await.unwrap();
+    let server = Server::bind(address).await.unwrap();
+    let mut listener = server.run().await.unwrap();
+
+    while let Some((user, mut session)) = listener.incoming().await {
+        println!("New user: {}", user);
+        loop {
+            if let Some(stream) = session.recv().await {
+                let data = stream.get_data();
+
+                println!("new data(len: {})", data.len());
+                println!("Packet id: 0x{:02X}", data[0]);
+            }
+        }
+    }
 
     // 'main: loop {
     //     if let Some((user, mut listener)) = server.recv().await {

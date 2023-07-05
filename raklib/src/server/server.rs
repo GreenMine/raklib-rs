@@ -44,6 +44,14 @@ pub struct Listener {
     receiver: mpsc::Receiver<ConnectedData>,
 }
 
+impl Listener {
+    pub async fn incoming(&mut self) -> Option<ConnectedData> {
+        use tokio_stream::StreamExt;
+
+        self.next().await
+    }
+}
+
 impl Stream for Listener {
     type Item = ConnectedData;
 
