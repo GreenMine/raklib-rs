@@ -19,7 +19,7 @@ impl<'a> RakNetString<'a> {
     }
 }
 
-impl<'a> Adapter for RakNetString<'a> {
+impl Adapter for RakNetString<'_> {
     fn read(_bs: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
@@ -41,7 +41,7 @@ impl<'a> Adapter for RakNetString<'a> {
     }
 }
 
-impl<'a> Index<usize> for RakNetString<'a> {
+impl Index<usize> for RakNetString<'_> {
     type Output = u8;
 
     fn index(&self, index: usize) -> &Self::Output {
@@ -49,7 +49,7 @@ impl<'a> Index<usize> for RakNetString<'a> {
     }
 }
 
-impl<'a> Index<Range<usize>> for RakNetString<'a> {
+impl Index<Range<usize>> for RakNetString<'_> {
     type Output = [u8];
 
     fn index(&self, range: Range<usize>) -> &Self::Output {

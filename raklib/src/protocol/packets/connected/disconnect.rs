@@ -13,3 +13,9 @@ impl Disconnect {
         Self {}
     }
 }
+
+impl Default for Disconnect {
+    fn default() -> Self {
+        Self::new()
+    }
+}

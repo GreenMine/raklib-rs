@@ -91,7 +91,7 @@ impl Session {
     }
 
     pub async fn handle_framepacket(&mut self, mut packet: FramePacket) {
-        if let Some(_) = packet.split_info {
+        if packet.split_info.is_some() {
             if let Some(split_result) = self.handle_split(packet) {
                 packet = split_result;
             } else {
@@ -141,7 +141,7 @@ impl Session {
         let split_id = split_info.fragment_id;
 
         let reliability = packet.reliability;
-        let list = self.split_packets.entry(split_id).or_insert(Vec::new());
+        let list = self.split_packets.entry(split_id).or_default();
         //TODO: Maybe push alternative type of FramePacket, which contains only split info + raw data, because always unwrap split info is kind of mindless
         list.push(packet);
 

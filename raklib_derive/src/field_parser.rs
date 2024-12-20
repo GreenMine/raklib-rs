@@ -1,7 +1,5 @@
 use proc_macro2::{Ident, TokenStream, TokenTree};
-use quote::{
-    quote,
-};
+use quote::quote;
 use syn::{Data, DeriveInput, Fields};
 
 pub enum StructField {
@@ -15,9 +13,9 @@ pub fn get_fields_with_attribute(current_struct: DeriveInput) -> Vec<StructField
     for f in get_fields(current_struct) {
         let name = f.ident.unwrap();
 
-        if f.attrs.len() > 0 {
+        if !f.attrs.is_empty() {
             for attribute in f.attrs {
-                let token = attribute.tokens.into_iter().nth(0).unwrap();
+                let token = attribute.tokens.into_iter().next().unwrap();
 
                 let group_stream =
                     extract!(token, TokenTree::Group(g) => g.stream(), "only group provided!");

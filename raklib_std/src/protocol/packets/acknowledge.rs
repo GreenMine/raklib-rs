@@ -19,7 +19,7 @@ pub struct Ack {
 }
 
 impl Ack {
-    pub fn from_packets(ack_packets: &mut Vec<u24>) -> Self {
+    pub fn from_packets(ack_packets: &mut [u24]) -> Self {
         let mut u32_ack = ack_packets
             .iter()
             .map(|&v| u32::from(v))

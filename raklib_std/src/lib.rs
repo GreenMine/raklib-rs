@@ -1,5 +1,3 @@
-#![feature(type_name_of_val)]
-
 pub mod packet;
 pub mod protocol;
 pub mod stream;

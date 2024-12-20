@@ -1,5 +1,5 @@
 use raklib_std::packet::{Packet, PacketDecode};
-use raklib_std::protocol::types::{self, Magic, RakNetString};
+use raklib_std::protocol::types::{self, Magic};
 use raklib_std::stream::BinaryStream;
 
 use crate::protocol::consts;
@@ -61,6 +61,6 @@ impl PacketDecode for OfflinePongPacket {
 impl Packet for OfflinePongPacket {
     const ID: u8 = 0x1c;
     fn packet_size(&self) -> usize {
-        1 + 8 + 8 + 16 + (2 + self.server_id_string.len() as usize)
+        1 + 8 + 8 + 16 + (2 + self.server_id_string.len())
     }
 }

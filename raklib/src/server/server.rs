@@ -1,9 +1,5 @@
 use std::sync::Arc;
-use std::{
-    collections::HashMap,
-    net::SocketAddr,
-    time::{Duration, Instant},
-};
+use std::{collections::HashMap, net::SocketAddr, time::Instant};
 
 use tokio::sync::{mpsc, Mutex};
 
@@ -58,7 +54,9 @@ impl Server {
                     if let Ok((read_bytes, addr)) = socket.try_recv_from(bstream.get_raw_mut()) {
                         // TODO: got out of unsafe(may using in bstream, but not there)
                         // SAFETY: u8 doesn't need to drop
-                        unsafe { bstream.get_raw_mut().set_len(read_bytes); }
+                        unsafe {
+                            bstream.get_raw_mut().set_len(read_bytes);
+                        }
 
                         let packet_id = bstream.read::<u8>().unwrap();
 

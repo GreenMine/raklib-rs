@@ -42,7 +42,7 @@ impl Adapter for u24 {
 
 impl From<u32> for u24 {
     fn from(num: u32) -> Self {
-        assert!(!(num > 0xFFFFFF), "overflow when convert u32 to u24");
+        assert!(num <= 0xFFFFFF, "overflow when convert u32 to u24");
 
         Self { num }
     }

@@ -59,8 +59,8 @@ pub enum Error {
 }
 
 pub async fn lookup_host<A: ToSocketAddrs>(address: A) -> Result<SocketAddr, Error> {
-    Ok(tokio::net::lookup_host(address)
+    tokio::net::lookup_host(address)
         .await?
         .next()
-        .ok_or(Error::Lookup)?)
+        .ok_or(Error::Lookup)
 }

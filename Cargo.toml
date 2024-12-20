@@ -1,10 +1,6 @@
 [workspace]
-members = [
-	"raklib",
-	"raklib_std",
-	"raklib_derive",
-	"raklib_examples"
-]
+members = ["raklib", "raklib_std", "raklib_derive", "raklib_examples"]
+resolver = "2"
 
 [profile.release]
 lto = "thin"

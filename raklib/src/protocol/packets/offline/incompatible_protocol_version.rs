@@ -13,3 +13,9 @@ impl IncompatibleProtocolVersion {
         IncompatibleProtocolVersion {}
     }
 }
+
+impl Default for IncompatibleProtocolVersion {
+    fn default() -> Self {
+        Self::new()
+    }
+}

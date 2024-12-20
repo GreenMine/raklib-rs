@@ -29,6 +29,7 @@ macro_rules! impl_for_base_type {
             Self: Sized,
         {
             unsafe {
+                #[allow(clippy::size_of_in_element_count)]
                 let slice = std::slice::from_raw_parts(
                     (self as *const Self) as *const u8,
                     std::mem::size_of::<Self>(),
@@ -77,7 +78,7 @@ impl Adapter for SocketAddr {
 }
 
 impl<T: Adapter> Adapter for &T {
-    fn read(bs: &mut BinaryStream) -> Result<Self>
+    fn read(_bs: &mut BinaryStream) -> Result<Self>
     where
         Self: Sized,
     {

@@ -29,6 +29,12 @@ impl Datagram {
     }
 }
 
+impl Default for Datagram {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Packet for Datagram {
     const ID: u8 = 0xFF;
 
