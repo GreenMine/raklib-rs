@@ -1,5 +1,6 @@
 use std::sync::Arc;
-use std::{collections::HashMap, net::SocketAddr, time::Instant};
+use std::{collections::HashMap, net::SocketAddr};
+use tokio::time::Instant;
 
 use tokio::sync::{mpsc, Mutex};
 
@@ -46,12 +47,10 @@ impl Server {
 
         tokio::spawn(async move {
             let mut bstream = BinaryStream::with_len(2048);
+            let mut tick = Instant::now() + TIME_PER_TICK;
             loop {
-                let tick_start = Instant::now();
-
-                //TODO: maybe need to rewrite it(now pasted from pmmp raklib implementation)
-                for _ in 0..100 {
-                    if let Ok((read_bytes, addr)) = socket.try_recv_from(bstream.get_raw_mut()) {
+                tokio::select! {
+                    Ok((read_bytes, addr)) = socket.recv_from(bstream.get_raw_mut()) => {
                         // TODO: got out of unsafe(may using in bstream, but not there)
                         // SAFETY: u8 doesn't need to drop
                         unsafe {
@@ -85,19 +84,11 @@ impl Server {
                         }
 
                         bstream.clear();
+                    },
+                    _ = tokio::time::sleep_until(tick) => {
+                        Self::update_sessions(Arc::clone(&sessions)).await; //FIXME: rewrite
+                        tick = Instant::now() + TIME_PER_TICK;
                     }
-                }
-
-                Self::update_sessions(Arc::clone(&sessions)).await; //FIXME: rewrite
-                for session in sessions.lock().await.values_mut() {
-                    session.update().await;
-
-                    if !session.status.is_connected() {}
-                }
-
-                let tick_lead_ms = tick_start.elapsed();
-                if tick_lead_ms < TIME_PER_TICK {
-                    tokio::time::sleep(TIME_PER_TICK - tick_lead_ms).await;
                 }
             }
         });
