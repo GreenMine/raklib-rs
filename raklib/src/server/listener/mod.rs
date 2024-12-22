@@ -9,7 +9,6 @@ use tokio::time::Instant;
 
 use raklib_std::protocol::packets::Datagram;
 use raklib_std::stream::BinaryStream;
-use tracing::info_span;
 
 use crate::net::UdpSocket;
 use crate::protocol::consts::TIME_PER_TICK;
@@ -48,6 +47,9 @@ impl Listener {
                     unsafe {
                         bstream.get_raw_mut().set_len(received_bytes);
                     }
+
+                    let span = tracing::info_span!("handle", ?addr);
+                    let _guard = span.enter();
 
                     match self.handle_packet(&mut bstream, addr).await {
                         Ok(_) => {},
