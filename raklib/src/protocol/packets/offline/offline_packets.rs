@@ -45,7 +45,7 @@ impl PacketDecode for OfflinePongPacket {
     {
         let time: u64 = bstream.read()?;
         let _: u64 = bstream.read()?;
-        let magic: Magic = bstream.read()?;
+        let _magic: Magic = bstream.read()?;
 
         let server_id_string: String = bstream.read()?;
 
