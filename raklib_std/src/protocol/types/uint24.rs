@@ -19,24 +19,17 @@ impl Adapter for u24 {
     where
         Self: Sized,
     {
-        unsafe {
-            let mut num = *(bs.read_slice(3)?.as_ptr() as *const u32);
-            num &= 0x00FFFFFF; //xD
+        let bytes = bs.read_slice(3)?;
+        let num = u32::from_le_bytes([bytes[0], bytes[1], bytes[2], 0]);
 
-            Ok(Self { num })
-        }
+        Ok(Self { num })
     }
 
     fn add(&self, bs: &mut BinaryStream)
     where
         Self: Sized,
     {
-        unsafe {
-            bs.add_slice(std::slice::from_raw_parts(
-                (&self.num as *const u32) as *const u8,
-                3,
-            ))
-        }
+        bs.add_slice(&self.num.to_le_bytes()[..3])
     }
 }
 
