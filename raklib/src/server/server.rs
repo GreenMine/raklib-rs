@@ -29,7 +29,7 @@ impl Server {
         Ok(server)
     }
 
-    pub async fn recv(&mut self) -> Option<ConnectedData> {
+    pub async fn accept(&mut self) -> Option<ConnectedData> {
         self.receiver.recv().await
     }
 }

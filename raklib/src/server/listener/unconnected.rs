@@ -53,7 +53,7 @@ impl super::Listener {
                 self.sessions.insert(addr, session);
 
                 // notify about new connection
-                self.sender.send((addr, connected_rx)).await.unwrap();
+                self.sender.send((connected_rx, addr)).await.unwrap();
             }
             _ => {
                 tracing::error!(packet.id = format!("0x{:02X}", packet_id), "Unknown packet");

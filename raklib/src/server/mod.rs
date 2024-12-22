@@ -15,6 +15,6 @@ pub enum Error {
 pub type Result<T> = std::result::Result<T, Error>;
 
 pub type ConnectedData = (
-    std::net::SocketAddr,
     tokio::sync::mpsc::Receiver<raklib_std::stream::BinaryStream>,
+    std::net::SocketAddr,
 );
