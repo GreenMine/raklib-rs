@@ -47,8 +47,6 @@ impl PacketDecode for OfflinePongPacket {
         let _: u64 = bstream.read()?;
         let magic: Magic = bstream.read()?;
 
-        log::info!("Magic validation: {}", magic.is_valid());
-
         let server_id_string: String = bstream.read()?;
 
         Ok(Self {

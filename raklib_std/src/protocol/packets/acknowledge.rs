@@ -51,8 +51,6 @@ impl Ack {
         });
         f(start, end);
 
-        log::debug!("ACK records: {:?}", records);
-
         Self { records }
     }
 }

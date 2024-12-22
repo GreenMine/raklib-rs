@@ -25,7 +25,8 @@ impl super::Listener {
             }
             FirstOpenConnectionRequest::ID => {
                 let request = bstream.decode::<FirstOpenConnectionRequest>().unwrap();
-                log::debug!("MTU length: {}", request.mtu_length);
+                tracing::debug!(mtu.length = request.mtu_length);
+
                 //TODO: protocol acceptor
                 if request.protocol_version != consts::PROTOCOL_VERSION {
                     socket
@@ -45,7 +46,7 @@ impl super::Listener {
                 let reply2 = SecondOpenConnectionReply::new(addr, request2.mtu_length, false);
 
                 socket.send(&reply2, addr).await?;
-                log::info!("Create new session for {}!", addr);
+                tracing::info!("new session");
 
                 let (connected_tx, connected_rx) = tokio::sync::mpsc::channel(2048);
                 let session = Session::new(addr, connected_tx, socket.clone());
@@ -55,7 +56,7 @@ impl super::Listener {
                 self.sender.send((addr, connected_rx)).await.unwrap();
             }
             _ => {
-                log::error!("Unimplemented packet: 0x{:02X}", packet_id);
+                tracing::error!(packet.id = format!("0x{:02X}", packet_id), "Unknown packet");
             }
         }
 

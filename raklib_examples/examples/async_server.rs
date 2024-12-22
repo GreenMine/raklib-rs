@@ -5,7 +5,9 @@ use raklib_std::packet::Packet;
 
 #[tokio::main]
 async fn main() {
-    env_logger::init();
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::TRACE)
+        .init();
 
     let address = "0.0.0.0:19135".parse().unwrap();
     let mut server = Server::bind(address).await.unwrap();

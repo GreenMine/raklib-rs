@@ -26,7 +26,8 @@ impl PacketDecode for NewIncomingConnection {
         let sys_addresses = (0..20)
             .map(|_| bstream.read::<SocketAddr>())
             .collect::<Result<Vec<_>>>()?;
-        log::debug!("System addresses: {:?}", sys_addresses);
+
+        tracing::debug!(addresses = ?sys_addresses, "system addresses");
 
         let _ping_time: i64 = bstream.read()?;
         let _pong_time: i64 = bstream.read()?;

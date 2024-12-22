@@ -28,14 +28,14 @@ impl UdpSocket {
         packet: &T,
         addr: A,
     ) -> std::io::Result<usize> {
-        if log::log_enabled!(log::Level::Trace) {
+        if tracing::enabled!(tracing::Level::TRACE) {
             let full_packet_name = std::any::type_name_of_val(packet);
             let packet_name = full_packet_name
                 .split("::")
                 .last()
                 .unwrap_or(full_packet_name);
 
-            log::debug!("Send {} packet!", packet_name);
+            tracing::trace!(packet_name, "send packet");
         }
 
         self.socket.send_to(packet.encode().get_raw(), addr).await

@@ -71,7 +71,6 @@ impl Adapter for String {
         Self: Sized,
     {
         let len: u16 = bs.read()?;
-        log::info!("Len of string: {}", len);
         let raw_str = bs.read_slice(len as usize)?;
         Ok(String::from_utf8_lossy(raw_str).to_string())
     }

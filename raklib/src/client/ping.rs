@@ -30,7 +30,7 @@ pub async fn ping<A: ToSocketAddrs>(address: A) -> Result<OfflinePongPacket, Err
                     return Ok(pong);
                 }
                 _ => {
-                    log::error!("Unexpected packet: 0x{:02X}", packet_id);
+                    tracing::error!("Unexpected packet: 0x{:02X}", packet_id);
                 }
             }
         }

@@ -76,7 +76,7 @@ impl Session {
     }
 
     pub fn handle_ack(&mut self, ack_packet: Ack) {
-        log::debug!("Received ACK packet: {:?}", ack_packet);
+        tracing::debug!(packet = ?ack_packet, "received ack packet");
     }
 
     pub fn handle_nack<T: PacketDecode>(&mut self, _nack: T) {

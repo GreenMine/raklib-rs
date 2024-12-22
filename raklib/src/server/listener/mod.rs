@@ -1,6 +1,7 @@
 mod unconnected;
 
 use std::collections::HashMap;
+use std::net::SocketAddr;
 use std::sync::Arc;
 
 use tokio::sync::mpsc;
@@ -8,6 +9,7 @@ use tokio::time::Instant;
 
 use raklib_std::protocol::packets::Datagram;
 use raklib_std::stream::BinaryStream;
+use tracing::info_span;
 
 use crate::net::UdpSocket;
 use crate::protocol::consts::TIME_PER_TICK;
@@ -31,15 +33,28 @@ impl Listener {
     }
 
     pub async fn listen(mut self) {
+        tracing::info!(
+            "RakNet listener started at {:?}",
+            self.socket.get_bind_address()
+        );
+
         let mut bstream = BinaryStream::with_len(2048);
         let mut tick = Instant::now() + TIME_PER_TICK;
         loop {
             tokio::select! {
-                result = self.handle_packet(&mut bstream) => {
-                    match result {
-                        Ok(_) => {},
-                        Err(e) => log::error!("handling packet: {e}")
+                Ok((received_bytes, addr)) = self.socket.recv_from(bstream.get_raw_mut()) => {
+                    // TODO: got out of unsafe(may using in bstream, but not there)
+                    // SAFETY: u8 doesn't need to drop
+                    unsafe {
+                        bstream.get_raw_mut().set_len(received_bytes);
                     }
+
+                    match self.handle_packet(&mut bstream, addr).await {
+                        Ok(_) => {},
+                        Err(e) => tracing::error!(?e, "handling packet")
+                    }
+
+                    bstream.clear();
                 },
                 _ = tokio::time::sleep_until(tick) => {
                     self.update_sessions().await;
@@ -49,32 +64,23 @@ impl Listener {
         }
     }
 
-    async fn handle_packet(&mut self, bstream: &mut BinaryStream) -> Result<()> {
-        let (received_bytes, addr) = self.socket.recv_from(bstream.get_raw_mut()).await?;
-
-        // TODO: got out of unsafe(may using in bstream, but not there)
-        // SAFETY: u8 doesn't need to drop
-        unsafe {
-            bstream.get_raw_mut().set_len(received_bytes);
-        }
-
-        let packet_id = bstream.read::<u8>()?;
+    async fn handle_packet(&mut self, packet: &mut BinaryStream, addr: SocketAddr) -> Result<()> {
+        let packet_id = packet.read::<u8>()?;
 
         if packet_id & Datagram::BITFLAG_VALID != 0 {
             if let Some(session) = self.sessions.get_mut(&addr) {
                 if packet_id & Datagram::BITFLAG_ACK != 0 {
-                    session.handle_ack(bstream.decode()?);
+                    session.handle_ack(packet.decode()?);
                 } else if packet_id & Datagram::BITFLAG_NAK != 0 {
                     unimplemented!("not acknowledge packet!");
                 } else {
-                    session.handle_datagram(bstream.decode()?).await;
+                    session.handle_datagram(packet.decode()?).await;
                 }
             }
         } else {
-            self.handle_unconnected(packet_id, bstream, addr).await?;
+            self.handle_unconnected(packet_id, packet, addr).await?;
         }
 
-        bstream.clear();
         Ok(())
     }
 
@@ -92,6 +98,7 @@ impl Listener {
 
         need_to_remove.iter().for_each(|a| {
             self.sessions.remove(a);
+            tracing::trace!(address = ?a, "session removed");
         });
     }
 }
