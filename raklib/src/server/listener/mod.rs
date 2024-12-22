@@ -9,14 +9,13 @@ use tokio::time::Instant;
 use raklib_std::protocol::packets::Datagram;
 use raklib_std::stream::BinaryStream;
 
-use super::Sessions;
 use crate::net::UdpSocket;
 use crate::protocol::consts::TIME_PER_TICK;
 use crate::server::ConnectedData;
 
 pub struct Listener {
     socket: Arc<UdpSocket>, // FIXME: fuck RefCounter
-    sessions: Sessions,
+    sessions: HashMap<std::net::SocketAddr, crate::server::session::Session>,
     sender: mpsc::Sender<ConnectedData>,
 }
 
