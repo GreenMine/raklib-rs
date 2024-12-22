@@ -9,7 +9,6 @@ async fn main() {
 
     let address = "0.0.0.0:19135".parse().unwrap();
     let mut server = Server::bind(address).await.unwrap();
-    server.run().await.unwrap();
 
     'main: loop {
         if let Some((user, mut listener)) = server.recv().await {
