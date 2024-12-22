@@ -13,8 +13,6 @@ pub struct Server {
     pub(super) receiver: mpsc::Receiver<ConnectedData>,
 }
 
-unsafe impl Send for Server {}
-
 impl Server {
     pub async fn bind(address: SocketAddr) -> Result<Self, NetError> {
         let socket = UdpSocket::bind(address).await?;
