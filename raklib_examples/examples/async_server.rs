@@ -1,7 +1,10 @@
+use std::net::SocketAddr;
+
 use flate2::{Decompress, FlushDecompress};
 
 use raklib::server::Server;
-use raklib_std::packet::Packet;
+use raklib_std::{packet::Packet, stream::BinaryStream};
+use tokio::sync::mpsc::Receiver;
 
 #[tokio::main]
 async fn main() {
@@ -12,16 +15,16 @@ async fn main() {
     let address = "0.0.0.0:19135".parse().unwrap();
     let mut server = Server::bind(address).await.unwrap();
 
-    'main: loop {
-        if let Some((user, mut listener)) = server.recv().await {
-            loop {
-                if let Some(stream) = listener.recv().await {
-                    let data = stream.get_data();
+    while let Some((socket, addr)) = server.accept().await {
+        tokio::spawn(async move { handle_client(socket, addr).await });
+    }
+}
 
-                    println!("new data(len: {})", data.len());
-                }
-            }
-        }
+async fn handle_client(mut socket: Receiver<BinaryStream>, addr: SocketAddr) {
+    while let Some(binary) = socket.recv().await {
+        let data = binary.get_data();
+
+        println!("new data(len: {})", data.len());
     }
 }
 
