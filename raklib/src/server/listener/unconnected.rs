@@ -13,7 +13,6 @@ impl super::Listener {
         packet_id: u8,
         bstream: &mut BinaryStream,
         addr: SocketAddr,
-        read_bytes: usize,
     ) -> Result<()> {
         let socket = &self.socket;
         match packet_id {

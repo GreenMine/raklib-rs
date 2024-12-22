@@ -57,7 +57,6 @@ impl Listener {
                             packet_id,
                             &mut bstream,
                             addr,
-                            read_bytes,
                         ).await.unwrap();
                    }
 
