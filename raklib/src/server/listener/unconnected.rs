@@ -1,30 +1,21 @@
 use std::net::SocketAddr;
-use std::sync::Arc;
 
-use tokio::sync::mpsc::Sender;
-use tokio::sync::{mpsc, Mutex};
-
-use crate::net::UdpSocket;
 use raklib_std::{packet::Packet, stream::BinaryStream};
 
-use crate::server::{ConnectedData, Sessions};
 use crate::{
     protocol::{consts, packets::offline::*},
-    server::session::Session,
+    server::{session::Session, Result},
 };
 
-use super::{Result, Server};
-
-impl Server {
-    pub(crate) async fn unconnected_handler(
-        socket: &Arc<UdpSocket>,
-        sender: &Sender<ConnectedData>,
-        sessions: &Arc<Mutex<Sessions>>,
+impl super::Listener {
+    pub(super) async fn handle_unconnected(
+        &mut self,
         packet_id: u8,
         bstream: &mut BinaryStream,
         addr: SocketAddr,
         read_bytes: usize,
     ) -> Result<()> {
+        let socket = &self.socket;
         match packet_id {
             OfflinePingPacket::ID => {
                 let offline_packet = bstream.decode::<OfflinePingPacket>()?;
@@ -57,19 +48,15 @@ impl Server {
                 socket.send(&reply2, addr).await?;
                 log::info!("Create new session for {}!", addr);
 
-                let (connected_tx, connected_rx) = mpsc::channel(2048);
+                let (connected_tx, connected_rx) = tokio::sync::mpsc::channel(2048);
                 let session = Session::new(addr, connected_tx, socket.clone());
-                sessions.lock().await.insert(addr, session);
+                self.sessions.insert(addr, session);
 
                 // notify about new connection
-                sender.send((addr, connected_rx)).await.unwrap();
+                self.sender.send((addr, connected_rx)).await.unwrap();
             }
             _ => {
-                log::error!(
-                    "Unimplemented packet: 0x{:02X}\nRead data:\n{}",
-                    packet_id,
-                    Self::bin_to_hex_table(&bstream.get_raw()[..read_bytes])
-                );
+                log::error!("Unimplemented packet: 0x{:02X}", packet_id);
             }
         }
 
